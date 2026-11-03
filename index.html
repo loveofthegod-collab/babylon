@@ -402,13 +402,16 @@
             const x = screenPos.x * canvasWidth;
             const y = screenPos.y * canvasHeight;
 
-            // Calculate camera angle relative to front
-            const angleY = camera.alpha - Math.PI / 2;
+            // Calculate normalized camera angles to prevent spinning / flipping glitches
+            let normAlpha = (camera.alpha % (Math.PI * 2));
+            if (normAlpha < 0) normAlpha += Math.PI * 2;
+            
+            const angleY = normAlpha - Math.PI / 2;
             const angleX = camera.beta - Math.PI / 2.3;
 
-            // Hide iframe if rotated to back of TV
-            const cosAlpha = Math.cos(camera.alpha);
-            if (cosAlpha < -0.2) {
+            // Hide iframe if TV is rotated around to the back side
+            const cosAlpha = Math.cos(normAlpha);
+            if (cosAlpha < -0.1) {
                 iframeContainer.style.opacity = '0';
                 iframeContainer.style.pointerEvents = 'none';
             } else {
@@ -416,16 +419,14 @@
                 iframeContainer.style.pointerEvents = 'auto';
             }
 
-            const scale = Math.max(0.3, 12 / camera.radius);
+            const scale = Math.max(0.35, Math.min(1.2, 12 / camera.radius));
             iframeContainer.style.transform = `translate(-50%, -50%) translate3d(${x - canvasWidth / 2}px, ${y - canvasHeight / 2}px, 0px) rotateY(${angleY}rad) rotateX(${-angleX}rad) scale(${scale})`;
         }
 
         function resetTVRotation() {
             if (!camera) return;
-            // Stop current camera animations if any to avoid continuous spinning
+            // Instantly stop animations and reset camera target smoothly without infinite loop
             scene.stopAnimation(camera);
-            
-            // Instantly reset target and smoothly set coordinates
             camera.setTarget(BABYLON.Vector3.Zero());
             camera.alpha = Math.PI / 2;
             camera.beta = Math.PI / 2.3;
