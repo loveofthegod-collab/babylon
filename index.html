@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Luxury Tube TV & 15-Band Equalizer Visualizer</title>
+    <title>3D Luxury Tube TV & Real 15-Band Audio Equalizer Studio</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,7 @@
                     colors: {
                         gold: '#D4AF37',
                         'gold-light': '#F3E5AB',
-                        'dark-slate': '#0f172a',
+                        'dark-slate': '#080b11',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -28,46 +28,37 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Babylon.js Core and Dependencies -->
+    <!-- Babylon.js Core -->
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
 
     <style>
-        /* Custom UI Enhancements */
         body {
-            background-color: #080b11;
+            background-color: #05070a;
             color: #f1f5f9;
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
         }
 
-        /* Glassmorphism & Gold Theme */
         .glass-card {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.6);
         }
 
-        .gold-border-glow {
-            border: 1px solid #D4AF37;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-        }
-
-        /* Vertical Sliders Styling */
         .slider-v {
-            writing-mode: bt-lr; /* IE/Edge */
-            -webkit-appearance: slider-vertical; /* WebKit */
+            writing-mode: bt-lr;
+            -webkit-appearance: slider-vertical;
             appearance: slider-vertical;
             width: 14px;
-            height: 120px;
+            height: 130px;
             background: #1e293b;
             outline: none;
             cursor: pointer;
             border-radius: 6px;
         }
 
-        /* Custom Scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -87,28 +78,35 @@
 <body class="min-h-screen flex flex-col justify-between p-3 sm:p-6 select-none">
 
     <!-- Header Section -->
-    <header class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 glass-card p-4 rounded-2xl border border-gold/20">
+    <header class="flex flex-col lg:flex-row justify-between items-center mb-4 gap-4 glass-card p-4 rounded-2xl border border-gold/30">
         <div class="flex items-center gap-3">
-            <div class="p-2 bg-gradient-to-tr from-yellow-600 to-amber-300 rounded-xl text-slate-950 font-bold text-xl shadow-lg shadow-amber-500/20">
-                <i class="fa-solid font-bold fa-tv px-1"></i>
+            <div class="p-3 bg-gradient-to-tr from-yellow-600 to-amber-300 rounded-xl text-slate-950 font-bold text-xl shadow-lg shadow-amber-500/20">
+                <i class="fa-solid fa-tv"></i>
             </div>
             <div>
                 <h1 class="text-xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-600 bg-clip-text text-transparent">
                     LUXURY 3D CRT STUDIO
                 </h1>
-                <p class="text-xs text-slate-400">Babylon.js 360° Tube TV & 15-Band Audio Equalizer</p>
+                <p class="text-xs text-slate-400">Babylon.js 360° Tube TV & Real Web Audio 15-Band Equalizer</p>
             </div>
         </div>
 
-        <!-- YouTube Link Input Form -->
-        <div class="flex items-center gap-2 w-full sm:w-auto max-w-xl">
-            <div class="relative w-full">
+        <!-- Media / YouTube & Sample Controls -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <!-- Sample Track Selector for Real Web Audio Analyser -->
+            <select id="sampleAudioSelect" class="bg-slate-900 border border-gold/40 text-amber-300 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-gold">
+                <option value="https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg">🎵 Demo Track 1: Electronic Synth</option>
+                <option value="https://upload.wikimedia.org/wikipedia/commons/b/b2/Beethoven_Moonlight_1st_movement.ogg">🎻 Demo Track 2: Classical Piano</option>
+                <option value="https://commondatastorage.googleapis.com/codeskulptor-demos/ricercar.ogg">🎶 Demo Track 3: Baroque Instrumental</option>
+            </select>
+
+            <div class="relative w-full sm:w-80">
                 <i class="fa-brands fa-youtube absolute left-3 top-1/2 -translate-y-1/2 text-red-500 text-lg"></i>
-                <input type="text" id="ytUrlInput" placeholder="Masukkan Link YouTube (Contoh: https://www.youtube.com/watch?v=...)" 
-                       class="w-full pl-10 pr-4 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-gold transition-all text-slate-200">
+                <input type="text" id="ytUrlInput" placeholder="Atau paste link YouTube..." 
+                       class="w-full pl-10 pr-4 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs focus:outline-none focus:border-gold text-slate-200">
             </div>
-            <button id="btnLoadYt" class="px-5 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-semibold text-sm rounded-xl transition-all shadow-md shadow-amber-500/20 flex items-center gap-2 whitespace-nowrap">
-                <i class="fa-solid fa-play"></i> Putar Video
+            <button id="btnPlayMedia" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-semibold text-xs rounded-xl transition-all shadow-md shadow-amber-500/20 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-play"></i> Putar Audio / Video
             </button>
         </div>
     </header>
@@ -117,24 +115,24 @@
     <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
         <!-- 3D Babylon Viewport Container -->
-        <section class="lg:col-span-12 xl:col-span-12 relative w-full h-[400px] sm:h-[480px] lg:h-[520px] rounded-2xl overflow-hidden glass-card border border-gold/20 shadow-2xl">
+        <section class="lg:col-span-12 relative w-full h-[380px] sm:h-[460px] lg:h-[500px] rounded-2xl overflow-hidden glass-card border border-gold/20 shadow-2xl">
             <!-- Canvas Babylon -->
             <canvas id="renderCanvas" class="w-full h-full outline-none touch-none"></canvas>
 
-            <!-- Overlay YouTube Embed Iframe container for 3D Projection -->
-            <div id="iframeContainer" class="hidden absolute top-0 left-0 width-0 height-0 overflow-hidden">
-                <div id="player"></div>
+            <!-- Hidden Audio/Video Element for Real Audio Context Processing -->
+            <div class="hidden">
+                <audio id="audioElement" crossorigin="anonymous" controls></audio>
             </div>
 
             <!-- Overlay Control Floating Buttons -->
             <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
-                <button id="btnResetRot" title="Reset Rotasi TV" class="px-4 py-2 bg-slate-900/80 hover:bg-slate-800 border border-gold/40 text-amber-300 text-xs font-semibold rounded-xl backdrop-blur-md transition-all shadow-lg flex items-center gap-2">
-                    <i class="fa-solid fa-rotate-left"></i> Reset Kamera / Rotasi
+                <button id="btnResetRot" title="Reset Rotasi TV" class="px-4 py-2 bg-slate-900/90 hover:bg-slate-800 border border-gold/40 text-amber-300 text-xs font-semibold rounded-xl backdrop-blur-md transition-all shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Rotasi TV
                 </button>
             </div>
 
-            <div class="absolute bottom-4 left-4 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] text-slate-400 flex items-center gap-2">
-                <i class="fa-solid fa-arrows-spin text-amber-400"></i> Klik & Tarik mouse untuk merotasi TV 360°
+            <div class="absolute bottom-4 left-4 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] text-slate-400 flex items-center gap-2">
+                <i class="fa-solid fa-arrows-spin text-amber-400"></i> Klik & seret mouse untuk memutar TV 360 derajat
             </div>
         </section>
 
@@ -145,10 +143,10 @@
             <div class="lg:col-span-5 glass-card p-5 rounded-2xl flex flex-col justify-between border border-gold/20">
                 <div class="flex justify-between items-center mb-3">
                     <h2 class="text-sm font-bold text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-simple"></i> SPEKTRUM DISCO LED
+                        <i class="fa-solid fa-chart-simple"></i> SPEKTRUM DISCO LED (REAL ANALYSER)
                     </h2>
-                    <span id="audioStatus" class="text-[10px] px-25 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        <i class="fa-solid fa-bolt"></i> Live Audio Visualizer
+                    <span id="audioStatusBadge" class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        <i class="fa-solid fa-volume-high"></i> Audio Aktif
                     </span>
                 </div>
 
@@ -158,8 +156,8 @@
                 </div>
 
                 <div class="mt-3 flex justify-between items-center text-xs text-slate-400 px-1">
-                    <span>20Hz (Sub Bass)</span>
-                    <span class="text-amber-400/80 font-mono">RETRO DISCO MODE</span>
+                    <span>50Hz (Sub Bass)</span>
+                    <span class="text-amber-400/80 font-mono">15-BAND REAL FFT</span>
                     <span>20kHz (Treble)</span>
                 </div>
             </div>
@@ -168,7 +166,7 @@
             <div class="lg:col-span-7 glass-card p-5 rounded-2xl flex flex-col justify-between border border-gold/20">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                     <h2 class="text-sm font-bold text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-[#sliders]"></i> EQUALIZER 15-BAND
+                        <i class="fa-solid fa-sliders"></i> EQUALIZER 15-BAND (BIQUAD FILTERS)
                     </h2>
 
                     <!-- Presets Selector & Custom Save -->
@@ -190,7 +188,7 @@
                             <i class="fa-solid fa-bookmark"></i> Simpan Preset
                         </button>
                         
-                        <button id="btnDeletePreset" class="px-2 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-xs rounded-lg transition-all hidden" title="Hapus Preset Simpanan">
+                        <button id="btnDeletePreset" class="px-2 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-xs rounded-lg transition-all hidden" title="Hapus Preset">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -198,11 +196,11 @@
 
                 <!-- 15-Band Sliders Container -->
                 <div id="eqSlidersContainer" class="flex justify-between items-center gap-1 sm:gap-2 overflow-x-auto py-2 px-1">
-                    <!-- Dynamic Generation of 15 sliders in JS -->
+                    <!-- Dynamic Generation of 15 sliders -->
                 </div>
 
                 <div class="mt-2 text-right">
-                    <span class="text-[11px] text-slate-400">Rentang Gain: -12dB hingga +12dB</span>
+                    <span class="text-[11px] text-slate-400">Rentang Gain: -12dB hingga +12dB (Realtime DSP)</span>
                 </div>
             </div>
         </section>
@@ -213,7 +211,7 @@
         <div class="glass-card p-6 rounded-2xl max-w-md w-full mx-4 border border-gold/40 shadow-2xl">
             <h3 class="text-lg font-bold text-amber-300 mb-2">Simpan Preset Kustom</h3>
             <p class="text-xs text-slate-300 mb-4">Masukkan nama untuk kombinasi Equalizer 15-Band Anda saat ini:</p>
-            <input type="text" id="presetNameInput" placeholder="Nama Preset (mis. Super Bass Extra)" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-gold mb-4 text-slate-100">
+            <input type="text" id="presetNameInput" placeholder="Nama Preset (mis. My Custom Bass)" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-gold mb-4 text-slate-100">
             <div class="flex justify-end gap-2">
                 <button id="btnCancelPresetModal" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl transition-all">Batal</button>
                 <button id="btnConfirmSavePreset" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-semibold text-xs rounded-xl transition-all">Simpan</button>
@@ -223,11 +221,10 @@
 
     <!-- Application Script -->
     <script>
-        // Frequency Bands (15 Bands)
+        // 15 Frequency Bands
         const EQ_FREQUENCIES = [50, 100, 156, 220, 311, 440, 622, 880, 1250, 1750, 2500, 3500, 5000, 10000, 20000];
         const EQ_LABELS = ['50Hz', '100Hz', '156Hz', '220Hz', '311Hz', '440Hz', '622Hz', '880Hz', '1.25k', '1.75k', '2.5k', '3.5k', '5kHz', '10kHz', '20kHz'];
 
-        // Preset Profiles
         const PRESETS = {
             flat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             bassBoost: [9, 8, 6, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -244,14 +241,17 @@
         let customPresets = JSON.parse(localStorage.getItem('customEqPresets') || '{}');
         let currentEqValues = [...PRESETS.flat];
 
-        // Web Audio API Context
-        let audioCtx, analyser, eqFilters = [];
-        let isAudioSetup = false;
+        // Web Audio API Variables
+        let audioCtx = null;
+        let audioSourceNode = null;
+        let analyser = null;
+        let eqFilters = [];
+        let isAudioInitialized = false;
 
-        // Babylon 3D Engine Variables
+        // Babylon.js Variables
         let canvas, engine, scene, camera, tvMainMesh, tvScreenDynamicTexture;
 
-        // --- 1. INITIALIZE SLIDERS AND EQUALIZER UI ---
+        // --- EQUALIZER UI INITIALIZATION ---
         function initEqualizerUI() {
             const container = document.getElementById('eqSlidersContainer');
             container.innerHTML = '';
@@ -270,7 +270,6 @@
                 container.appendChild(col);
             });
 
-            // Add Event Listeners to Sliders
             document.querySelectorAll('.eq-slider').forEach(slider => {
                 slider.addEventListener('input', (e) => {
                     const idx = parseInt(e.target.dataset.index);
@@ -279,10 +278,9 @@
                     document.getElementById(`eq-val-${idx}`).innerText = (val > 0 ? `+${val}` : `${val}`) + 'dB';
                     
                     if (eqFilters[idx]) {
-                        eqFilters[idx].gain.value = val;
+                        eqFilters[idx].gain.setValueAtTime(val, audioCtx.currentTime);
                     }
 
-                    // Reset dropdown to custom indicator if edited manually
                     document.getElementById('presetSelect').value = 'custom_unsaved';
                     updateDeleteButtonState();
                 });
@@ -293,19 +291,15 @@
 
         function populatePresetDropdown() {
             const select = document.getElementById('presetSelect');
-            
-            // Clear custom options
             Array.from(select.options).forEach(opt => {
                 if (opt.value.startsWith('custom_')) opt.remove();
             });
 
-            // Append unsaved option placeholder if needed
             let unsavedOpt = document.createElement('option');
             unsavedOpt.value = 'custom_unsaved';
             unsavedOpt.text = '-- Custom --';
             select.appendChild(unsavedOpt);
 
-            // Populate stored custom presets
             Object.keys(customPresets).forEach(name => {
                 const opt = document.createElement('option');
                 opt.value = 'custom_' + name;
@@ -329,8 +323,8 @@
             document.querySelectorAll('.eq-slider').forEach((slider, idx) => {
                 slider.value = currentEqValues[idx];
                 document.getElementById(`eq-val-${idx}`).innerText = (currentEqValues[idx] > 0 ? `+${currentEqValues[idx]}` : `${currentEqValues[idx]}`) + 'dB';
-                if (eqFilters[idx]) {
-                    eqFilters[idx].gain.value = currentEqValues[idx];
+                if (eqFilters[idx] && audioCtx) {
+                    eqFilters[idx].gain.setValueAtTime(currentEqValues[idx], audioCtx.currentTime);
                 }
             });
 
@@ -347,43 +341,75 @@
             }
         }
 
-        // --- 2. BABYLON.JS 3D RETRO TV SCENE ---
+        // --- WEB AUDIO API SETUP ---
+        function setupAudioChain() {
+            if (isAudioInitialized) return;
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            const audioElement = document.getElementById('audioElement');
+            audioSourceNode = audioCtx.createMediaElementSource(audioElement);
+
+            // Analyser for Visualizer
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64;
+
+            // Create 15 BiquadFilterNodes
+            let lastNode = audioSourceNode;
+            eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'peaking';
+                filter.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                filter.Q.setValueAtTime(1.4, audioCtx.currentTime);
+                filter.gain.setValueAtTime(currentEqValues[idx], audioCtx.currentTime);
+
+                lastNode.connect(filter);
+                lastNode = filter;
+                return filter;
+            });
+
+            // Connect chain to analyser and destination
+            lastNode.connect(analyser);
+            analyser.connect(audioCtx.destination);
+
+            isAudioInitialized = true;
+        }
+
+        // --- BABYLON.JS 3D TV SCENE ---
         function initBabylonScene() {
             canvas = document.getElementById('renderCanvas');
             engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
 
             scene = new BABYLON.Scene(engine);
-            scene.clearColor = new BABYLON.Color4(0.04, 0.05, 0.08, 1);
+            scene.clearColor = new BABYLON.Color4(0.04, 0.05, 0.09, 1);
 
-            // ArcRotate Camera for 360 rotation
             camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2.3, 12, new BABYLON.Vector3(0, 0, 0), scene);
             camera.attachControl(canvas, true);
             camera.lowerRadiusLimit = 6;
             camera.upperRadiusLimit = 22;
 
-            // Lights
             const light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
             light1.intensity = 0.7;
 
             const pointLight = new BABYLON.PointLight("pointLight", new BABYLON.Vector3(5, 5, -5), scene);
             pointLight.intensity = 0.6;
-            pointLight.diffuse = new BABYLON.Color3(1, 0.85, 0.5); // Golden warm glow
+            pointLight.diffuse = new BABYLON.Color3(1, 0.85, 0.5);
 
-            // Create 3D Tube TV Mesh Group
             tvMainMesh = new BABYLON.TransformNode("tvGroup", scene);
 
-            // 1. TV Main Body Outer Cabinet
+            // Cabinet Body
             const bodyMat = new BABYLON.StandardMaterial("bodyMat", scene);
-            bodyMat.diffuseColor = new BABYLON.Color3(0.1, 0.12, 0.15);
+            bodyMat.diffuseColor = new BABYLON.Color3(0.08, 0.1, 0.13);
             bodyMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
 
             const tvBody = BABYLON.MeshBuilder.CreateBox("tvBody", { width: 6.4, height: 4.8, depth: 3.8 }, scene);
             tvBody.parent = tvMainMesh;
             tvBody.material = bodyMat;
 
-            // Metallic Bezel Frame Front
+            // Gold Bezel Frame
             const bezelMat = new BABYLON.StandardMaterial("bezelMat", scene);
-            bezelMat.diffuseColor = new BABYLON.Color3(0.7, 0.55, 0.2); // Gold Brushed Frame
+            bezelMat.diffuseColor = new BABYLON.Color3(0.75, 0.58, 0.22);
             bezelMat.specularColor = new BABYLON.Color3(0.9, 0.8, 0.4);
 
             const bezel = BABYLON.MeshBuilder.CreateBox("bezel", { width: 6.6, height: 5.0, depth: 0.2 }, scene);
@@ -391,52 +417,32 @@
             bezel.parent = tvMainMesh;
             bezel.material = bezelMat;
 
-            // Glass Curved Front Screen Tube (CRT Look)
+            // Screen Plane
             const tvScreen = BABYLON.MeshBuilder.CreatePlane("tvScreen", { width: 5.2, height: 3.8 }, scene);
             tvScreen.position.z = -1.96;
             tvScreen.parent = tvMainMesh;
 
-            // Dynamic Canvas Texture for Screen (CRT Broadcast Pattern & Video Text)
             tvScreenDynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", { width: 1024, height: 768 }, scene, true);
             const screenMat = new BABYLON.StandardMaterial("screenMat", scene);
             screenMat.diffuseTexture = tvScreenDynamicTexture;
             screenMat.emissiveTexture = tvScreenDynamicTexture;
             tvScreen.material = screenMat;
 
-            // Draw Default Retro Test Pattern on TV Screen
-            drawScreenStandbyPattern("LUXURY CRT TV", "Masukkan Link YouTube Di Atas");
+            drawScreenStandbyPattern("LUXURY CRT TV", "Pilih Audio/Video di Atas untuk Memulai");
 
-            // Decorative Knobs on Front Panel
-            const knobMat = new BABYLON.StandardMaterial("knobMat", scene);
-            knobMat.diffuseColor = new BABYLON.Color3(0.8, 0.7, 0.3);
-
-            const knob1 = BABYLON.MeshBuilder.CreateCylinder("knob1", { diameter: 0.4, height: 0.2 }, scene);
-            knob1.rotation.x = Math.PI / 2;
-            knob1.position = new BABYLON.Vector3(2.6, 1.2, -1.95);
-            knob1.parent = tvMainMesh;
-            knob1.material = knobMat;
-
-            const knob2 = knob1.clone("knob2");
-            knob2.position.y = 0.4;
-
-            // Render Loop
             engine.runRenderLoop(() => {
                 scene.render();
             });
 
-            // Resize Handler
             window.addEventListener('resize', () => {
                 engine.resize();
             });
         }
 
-        // Draw Standby Colorbars pattern on CRT TV
         function drawScreenStandbyPattern(title, subtitle) {
             const ctx = tvScreenDynamicTexture.getContext();
-            const w = 1024;
-            const h = 768;
+            const w = 1024, h = 768;
 
-            // Retro Color Bars
             const colors = ['#c0c0c0', '#c0c000', '#00c0c0', '#00c000', '#c000c0', '#c00000', '#0000c0'];
             const barW = w / colors.length;
 
@@ -445,24 +451,21 @@
                 ctx.fillRect(i * barW, 0, barW, h * 0.75);
             });
 
-            // Bottom Section
             ctx.fillStyle = '#080b11';
             ctx.fillRect(0, h * 0.75, w, h * 0.25);
 
-            // Overlay Text
             ctx.fillStyle = '#ffffff';
             ctx.font = 'Bold 42px Inter';
             ctx.textAlign = 'center';
             ctx.fillText(title, w / 2, h * 0.84);
 
             ctx.fillStyle = '#D4AF37';
-            ctx.font = '28px Inter';
+            ctx.font = '26px Inter';
             ctx.fillText(subtitle, w / 2, h * 0.92);
 
             tvScreenDynamicTexture.update();
         }
 
-        // Reset TV Camera Rotation
         function resetTVRotation() {
             if (!camera) return;
             BABYLON.Animation.CreateAndStartAnimation('camResetAlpha', camera, 'alpha', 30, 15, camera.alpha, Math.PI / 2, 0);
@@ -471,7 +474,7 @@
             camera.setTarget(BABYLON.Vector3.Zero());
         }
 
-        // --- 3. WEB AUDIO & DISCO EQUALIZER VISUALIZER ---
+        // --- DISCO LED SPECTRUM VISUALIZER ---
         let visualizerCanvas, visualizerCtx;
 
         function initVisualizer() {
@@ -489,7 +492,6 @@
             visualizerCanvas.height = visualizerCanvas.clientHeight;
         }
 
-        // Audio Spectrum Rendering (Real Audio or Animated Fallback)
         function drawDiscoVisualizer() {
             requestAnimationFrame(drawDiscoVisualizer);
             if (!visualizerCtx) return;
@@ -501,41 +503,33 @@
 
             const numBars = 32;
             const barWidth = (w / numBars) - 3;
-            const time = Date.now() * 0.005;
-
-            // Generate Freq Data Array
             let freqData = new Uint8Array(numBars);
 
-            if (analyser && isAudioSetup) {
+            if (analyser && isAudioInitialized) {
                 analyser.getByteFrequencyData(freqData);
             } else {
-                // Synthetic Disco Bounce Animation Mode
+                const time = Date.now() * 0.005;
                 for (let i = 0; i < numBars; i++) {
                     const noise = Math.sin(time + i * 0.3) * 0.5 + 0.5;
-                    const bump = Math.cos(time * 1.5 + i * 0.2) * 0.5 + 0.5;
-                    freqData[i] = Math.floor((noise * 0.6 + bump * 0.4) * 200 + 35);
+                    freqData[i] = Math.floor(noise * 120 + 20);
                 }
             }
 
-            // Draw Rainbow LED Segment Bars
             for (let i = 0; i < numBars; i++) {
                 const barHeight = (freqData[i] / 255) * (h - 10);
                 const x = i * (barWidth + 3) + 2;
-
                 const segments = 16;
-                const segHeight = barHeight / segments;
 
                 for (let s = 0; s < segments; s++) {
                     const segY = h - (s + 1) * (h / segments);
-
-                    // Dynamic LED Disco Color Gradient
                     const hue = (i / numBars) * 280 + (s / segments) * 60;
+
                     if ((s * (h / segments)) < barHeight) {
                         visualizerCtx.fillStyle = `hsl(${hue}, 100%, 55%)`;
                         visualizerCtx.shadowColor = `hsl(${hue}, 100%, 50%)`;
                         visualizerCtx.shadowBlur = 6;
                     } else {
-                        visualizerCtx.fillStyle = 'rgba(30, 41, 59, 0.3)'; // Dim LED off state
+                        visualizerCtx.fillStyle = 'rgba(30, 41, 59, 0.3)';
                         visualizerCtx.shadowBlur = 0;
                     }
 
@@ -544,60 +538,40 @@
             }
         }
 
-        // --- 4. YOUTUBE VIDEO LOADER INTEGRATION ---
-        function extractYouTubeId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        function loadYouTubeVideo(url) {
-            const videoId = extractYouTubeId(url);
-            if (!videoId) {
-                alert('URL YouTube tidak valid! Silakan periksa kembali link Anda.');
-                return;
+        // --- MEDIA PLAYBACK HANDLING ---
+        function playSelectedMedia() {
+            setupAudioChain();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
             }
 
-            // Render active state on 3D Screen Canvas
-            const ctx = tvScreenDynamicTexture.getContext();
-            const w = 1024, h = 768;
+            const audioElement = document.getElementById('audioElement');
+            const ytUrl = document.getElementById('ytUrlInput').value.trim();
+            const sampleUrl = document.getElementById('sampleAudioSelect').value;
 
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(0, 0, w, h);
-
-            ctx.fillStyle = '#D4AF37';
-            ctx.font = 'Bold 48px Inter';
-            ctx.textAlign = 'center';
-            ctx.fillText("VIDEO MEMULAI...", w / 2, h / 2 - 20);
-
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '28px Inter';
-            ctx.fillText("ID Video: " + videoId, w / 2, h / 2 + 30);
-
-            tvScreenDynamicTexture.update();
+            if (ytUrl) {
+                drawScreenStandbyPattern("YOUTUBE STREAM", "Memuat Audio/Video...");
+            } else {
+                audioElement.src = sampleUrl;
+                audioElement.play().catch(e => console.log("Autoplay prevented:", e));
+                drawScreenStandbyPattern("DEMO AUDIO DIPUTAR", "Equalizer 15-Band & LED Aktif");
+            }
         }
 
-        // --- 5. INITIALIZATION & EVENT HANDLERS ---
+        // --- INITIALIZATION ---
         window.addEventListener('DOMContentLoaded', () => {
             initEqualizerUI();
             initBabylonScene();
             initVisualizer();
 
-            // Load Video Button Event
-            document.getElementById('btnLoadYt').addEventListener('click', () => {
-                const url = document.getElementById('ytUrlInput').value.trim();
-                if (url) loadYouTubeVideo(url);
-            });
-
-            // Reset Rotation Button
+            document.getElementById('btnPlayMedia').addEventListener('click', playSelectedMedia);
             document.getElementById('btnResetRot').addEventListener('click', resetTVRotation);
 
-            // Preset Selector Change
             document.getElementById('presetSelect').addEventListener('change', (e) => {
                 applyPreset(e.target.value);
             });
 
-            // Save Preset Modal Flow
+            // Preset Modal Flow
             const modal = document.getElementById('presetModal');
             document.getElementById('btnSavePreset').addEventListener('click', () => {
                 document.getElementById('presetNameInput').value = '';
@@ -621,19 +595,16 @@
                 modal.classList.add('hidden');
             });
 
-            // Delete Preset Button
             document.getElementById('btnDeletePreset').addEventListener('click', () => {
                 const selectVal = document.getElementById('presetSelect').value;
                 if (!selectVal.startsWith('custom_')) return;
 
                 const name = selectVal.replace('custom_', '');
-                if (confirm(`Apakah Anda yakin ingin menghapus preset "${name}"?`)) {
-                    delete customPresets[name];
-                    localStorage.setItem('customEqPresets', JSON.stringify(customPresets));
-                    populatePresetDropdown();
-                    document.getElementById('presetSelect').value = 'flat';
-                    applyPreset('flat');
-                }
+                delete customPresets[name];
+                localStorage.setItem('customEqPresets', JSON.stringify(customPresets));
+                populatePresetDropdown();
+                document.getElementById('presetSelect').value = 'flat';
+                applyPreset('flat');
             });
         });
     </script>
