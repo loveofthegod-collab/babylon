@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TUBE DISCO 3D - HITACHI ELITE</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<style>
+:root{
+  --gold:#D4AF37;
+  --gold2:#F9E784;
+  --bg:#08080A;
+  --panel:rgba(20,20,24,0.85);
+  --border:rgba(212,175,55,0.22);
+  --text:#EAE6D9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(212,175,55,0.18), transparent),
+              radial-gradient(1000px 500px at 90% 0%, rgba(120,80,255,0.12), transparent),
+              var(--bg);
+  color:var(--text);
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  overflow-x:hidden;
+}
+header{
+  padding:18px 24px;
+  display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border);
+  backdrop-filter: blur(18px);
+  position:sticky;top:0;z-index:20;
+  background: rgba(8,8,10,0.7);
+}
+.brand{font-family:'Syne',sans-serif;font-weight:800;letter-spacing:-0.02em;font-size:22px}
+.brand span{color:var(--gold)}
+.badge{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);border:1px solid var(--border);padding:6px 10px;border-radius:999px;background:rgba(212,175,55,0.08)}
+#canvasContainer{
+  position:relative;
+  width:100%;
+  height:62vh;
+  min-height:420px;
+  max-height:760px;
+  background: radial-gradient(800px 400px at 50% 0%, rgba(255,255,255,0.06), transparent), #0F0F12;
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+#renderCanvas{width:100%;height:100%;display:block;outline:none}
+#ytOverlay{
+  position:absolute; left:0; top:0; width:0; height:0;
+  overflow:hidden; pointer-events:none;
+  display:none;
+  border-radius:8px;
+  box-shadow:0 0 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,175,55,0.2) inset;
+  z-index:5;
+  background:#000;
+}
+#ytOverlay iframe, #ytPlayer{width:100%;height:100%;border:0;display:block}
+#loading{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);
+  border:1px solid var(--border);padding:12px 18px;border-radius:999px;
+  font-size:12px;letter-spacing:0.12em;color:var(--gold2);
+  z-index:6;
+}
+#controlsBar{
+  display:flex;flex-wrap:wrap;gap:12px;
+  padding:16px 20px;
+  background:linear-gradient(180deg, rgba(24,24,28,0.9), rgba(16,16,20,0.9));
+  border-bottom:1px solid var(--border);
+  backdrop-filter: blur(12px);
+  align-items:center;
+}
+.yt-input-group{flex:1 1 420px;display:flex;gap:10px;align-items:center}
+.yt-input-group input{
+  flex:1;
+  background:rgba(0,0,0,0.5);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  color:var(--text);
+  font-size:14px;
+  outline:none;
+  transition:0.2s;
+}
+.yt-input-group input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,0.15)}
+.btn{
+  background: linear-gradient(180deg, var(--gold2), var(--gold));
+  color:#111; font-weight:700; letter-spacing:0.02em;
+  border:0; border-radius:14px;
+  padding:13px 18px; cursor:pointer;
+  box-shadow:0 8px 24px rgba(212,175,55,0.25), inset 0 1px 0 rgba(255,255,255,0.6);
+  transition:transform 0.15s, filter 0.15s;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px) scale(0.98)}
+.btn.secondary{
+  background:rgba(255,255,255,0.06);
+  color:var(--text);
+  border:1px solid var(--border);
+  box-shadow:none;
+}
+.action-group{display:flex;gap:10px;flex-wrap:wrap}
+#eqSection{
+  display:grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap:16px;
+  padding:18px;
+  max-width:1600px;
+  margin:0 auto;
+  width:100%;
+}
+@media(max-width:960px){#eqSection{grid-template-columns:1fr} #canvasContainer{height:52vh}}
+.panel{
+  background: linear-gradient(180deg, rgba(28,28,34,0.9), rgba(18,18,22,0.92));
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter: blur(18px);
+  position:relative;
+  overflow:hidden;
+}
+.panel::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:1px;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.5), transparent);
+}
+.panel h3{
+  font-family:'Syne',sans-serif;
+  font-size:14px;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--gold2);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.panel h3::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+#discoCanvas{width:100%;height:220px;display:block;border-radius:14px;background: radial-gradient(400px 200px at 50% 0%, rgba(212,175,55,0.08), transparent), #0A0A0C;border:1px solid rgba(255,255,255,0.06)}
+.disco-stats{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;letter-spacing:0.12em;color:rgba(234,230,217,0.5)}
+.preset-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.preset-row select{
+  flex:1 1 200px;
+  background:rgba(0,0,0,0.5);border:1px solid var(--border);
+  color:var(--text);border-radius:12px;padding:11px 12px;
+}
+.eq-sliders{
+  display:grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap:6px;
+  align-items:end;
+  background: rgba(0,0,0,0.35);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px;
+  padding:14px 10px 10px 10px;
+}
+@media(max-width:700px){
+  .eq-sliders{grid-template-columns: repeat(8, 1fr)}
+}
+.slider-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.slider-col label{font-size:10px;color:rgba(234,230,217,0.6);letter-spacing:0.04em}
+.v-slider{
+  -webkit-appearance:none;appearance:none;
+  width:120px;height:6px;
+  transform:rotate(-90deg);
+  transform-origin: 60px 60px;
+  margin:56px 0;
+  background: linear-gradient(90deg, rgba(212,175,55,0.2), rgba(212,175,55,0.5));
+  border-radius:999px;
+  outline:none;
+}
+.v-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--gold2) 30%, var(--gold));
+  border:1px solid rgba(0,0,0,0.3);
+  box-shadow:0 2px 8px rgba(212,175,55,0.6);
+  cursor:pointer;
+}
+.v-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--gold);border:0}
+.val{font-size:11px;font-weight:600;min-width:34px;text-align:center;padding:3px 6px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08)}
+.val.pos{background:rgba(212,175,55,0.18);color:var(--gold2);border-color:rgba(212,175,55,0.3)}
+.custom-saves{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:11px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--border);cursor:pointer}
+.chip:hover{border-color:var(--gold);color:var(--gold2)}
+.scanlines{
+  position:absolute;inset:0;pointer-events:none;z-index:4;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.02) 3px);
+  mix-blend-mode: overlay;
+}
+#realVideo{display:none}
+.note{font-size:11px;color:rgba(234,230,217,0.45);margin-top:8px;line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">TUBE <span>DISCO</span> • HITACHI ELITE 1978</div>
+  <div class="badge">Babylon.js • 15-Band EQ • WebAudio</div>
+</header>
+
+<div id="canvasContainer">
+  <canvas id="renderCanvas"></canvas>
+  <div id="ytOverlay"><div id="ytPlayer"></div></div>
+  <div class="scanlines"></div>
+  <div id="loading">INITIALIZING TUBE TV...</div>
+  <video id="realVideo" playsinline crossorigin="anonymous"></video>
+</div>
+
+<div id="controlsBar">
+  <div class="yt-input-group">
+    <input id="ytInput" placeholder="Masukkan YouTube link (youtu.be / youtube.com/watch?v=) — contoh: https://youtu.be/dQw4w9WgXcQ">
+    <button class="btn" id="playBtn">▶ PLAY DI TUBE TV</button>
+  </div>
+  <div class="action-group">
+    <button class="btn secondary" id="resetBtn">↺ Reset Rotation</button>
+    <button class="btn secondary" id="fullscreenBtn">⛶ Fullscreen</button>
+    <button class="btn secondary" id="testBtn">♫ Test Audio Disco</button>
+  </div>
+</div>
+
+<div id="eqSection">
+  <div class="panel disco-panel">
+    <h3>Equalizer Bar Disco Berwarna-Warni — Left Channel</h3>
+    <canvas id="discoCanvas" width="640" height="220"></canvas>
+    <div class="disco-stats"><span>BASS • 50-311Hz</span><span>MID • 440-3.5KHz</span><span>TREBLE • 5-20KHz</span><span id="fps">60 FPS</span></div>
+    <div class="note">Disco mengikuti suara. Jika pakai YouTube iframe (karena CORS), visual akan fake-reactive beat-synced. Jika video berhasil load via proxy MP4, itu real spectrum analysis via WebAudio.</div>
+  </div>
+  <div class="panel eq-panel">
+    <h3>Pengaturan Equalizer 15-Band — Right Column</h3>
+    <div class="preset-row">
+      <select id="presetSelect"></select>
+      <button class="btn secondary" id="saveCustomBtn">+ Save Custom</button>
+      <button class="btn secondary" id="flatBtn">Flat</button>
+    </div>
+    <div id="eqSliders" class="eq-sliders"></div>
+    <div class="custom-saves" id="customSaves"></div>
+    <div class="note">Preset: Bass Boost, Treble Boost, Vocal/Voice, Pop, Rock/Metal, Classical/Akustik, Bright, Mellow/Relaxed, Speech, Custom. Custom bisa save banyak jenis, disimpan di localStorage. EQ pakai 15x BiquadFilter Peaking (WebAudio) kalau source-nya real &lt;video&gt;.</div>
+  </div>
+</div>
+
+<script>
+// ---------- CONFIG ----------
+const frequencies = [50,100,156,220,311,440,622,880,1250,1750,2500,3500,5000,10000,20000];
+const presets = {
+  "Flat":              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  "Bass Boost":        [8,7,6,5,4,2,0,-1,-1,-1,0,1,1,1,0],
+  "Treble Boost":      [-2,-1,0,0,0,0,1,2,3,4,5,6,6,7,8],
+  "Vocal / Voice":     [-3,-2,-1,0,1,2,3,5,5,4,2,0,-1,-2,-3],
+  "Pop":               [2,3,4,2,0,-1,-2,-1,0,1,2,3,2,1,0],
+  "Rock / Metal":      [5,4,3,2,-1,-2,-1,1,3,3,2,1,2,3,4],
+  "Classical / Akustik": [0,0,0,0,0,0,-1,-2,-1,1,2,3,4,4,3],
+  "Bright":            [-1,-1,0,0,1,2,3,3,4,4,5,5,6,6,7],
+  "Mellow / Relaxed":  [2,2,1,1,0,-1,-2,-3,-3,-2,-1,-2,-3,-4,-5],
+  "Speech":            [-5,-4,-3,-2,-1,1,3,5,6,5,3,1,-1,-3,-5],
+  "Custom":            [3,3,7.3,7,3,-1,-6.6,-6.3,-4.5,-4,1.1,1.2,5.8,7.9,8.8] // from screenshot
+};
+let eqValues = [...presets["Custom"]];
+let audioContext = null, analyser = null, filters = [], fakeTime=0;
+let ytPlayer = null, currentVideoId = null;
+let isFakeAudio = true;
+let screenMesh, screenMat, colorBarTex, tvBars = [];
+
+// ---------- EQ UI ----------
+const eqSlidersDiv = document.getElementById('eqSliders');
+const presetSelect = document.getElementById('presetSelect');
+Object.keys(presets).forEach(k=>{
+  const o=document.createElement('option');o.value=k;o.textContent=k;presetSelect.appendChild(o);
+});
+presetSelect.value='Custom';
+
+function buildSliders(){
+  eqSlidersDiv.innerHTML='';
+  frequencies.forEach((freq,i)=>{
+    const col=document.createElement('div');col.className='slider-col';
+    const lab=document.createElement('label');lab.textContent = freq>=1000 ? (freq/1000)+'K' : freq;
+    const input=document.createElement('input');input.type='range';input.min=-12;input.max=12;input.step=0.1;input.value=eqValues[i];input.className='v-slider';input.dataset.idx=i;
+    const val=document.createElement('div');val.className='val';val.textContent=eqValues[i].toFixed(1)+' dB';
+    if(eqValues[i]>0) val.classList.add('pos');
+    input.addEventListener('input', e=>{
+      const idx=parseInt(e.target.dataset.idx);
+      const v=parseFloat(e.target.value);
+      eqValues[idx]=v;
+      val.textContent=v.toFixed(1)+' dB';
+      val.classList.toggle('pos', v>0);
+      if(filters[idx]) filters[idx].gain.value=v;
+    });
+    col.appendChild(lab);col.appendChild(input);col.appendChild(val);
+    eqSlidersDiv.appendChild(col);
+  });
+}
+buildSliders();
+
+function applyPreset(name){
+  if(!presets[name]) return;
+  eqValues=[...presets[name]];
+  buildSliders();
+  filters.forEach((f,i)=>{ if(f) f.gain.value=eqValues[i]; });
+}
+presetSelect.addEventListener('change', e=>applyPreset(e.target.value));
+document.getElementById('flatBtn').addEventListener('click', ()=>applyPreset('Flat'));
+
+function refreshCustomChips(){
+  const c=document.getElementById('customSaves');
+  c.innerHTML='';
+  const saved = JSON.parse(localStorage.getItem('tubeCustomEQ')||'{}');
+  Object.keys(saved).forEach(name=>{
+    const chip=document.createElement('div');chip.className='chip';chip.textContent='★ '+name;
+    chip.onclick=()=>{ eqValues=[...saved[name]]; buildSliders(); filters.forEach((f,i)=>f && (f.gain.value=eqValues[i])); presetSelect.value='Custom'; };
+    const del=document.createElement('span');del.textContent=' ×';del.style.color='#ff7777';del.onclick=(ev)=>{ev.stopPropagation(); delete saved[name]; localStorage.setItem('tubeCustomEQ', JSON.stringify(saved)); refreshCustomChips();};
+    chip.appendChild(del);
+    c.appendChild(chip);
+  });
+}
+refreshCustomChips();
+document.getElementById('saveCustomBtn').addEventListener('click', ()=>{
+  const name=prompt('Nama preset Custom:','My Disco '+new Date().toLocaleTimeString());
+  if(!name) return;
+  const saved=JSON.parse(localStorage.getItem('tubeCustomEQ')||'{}');
+  saved[name]=[...eqValues];
+  localStorage.setItem('tubeCustomEQ', JSON.stringify(saved));
+  refreshCustomChips();
+  alert('Saved! '+name);
+});
+
+// ---------- BABYLON SCENE ----------
+const canvas=document.getElementById('renderCanvas');
+const engine=new BABYLON.Engine(canvas, true, {preserveDrawingBuffer:true, stencil:true, antialias:true});
+let scene, camera, tvRoot;
+
+function createColorBarTexture(scene){
+  const size=1024;
+  const tex=new BABYLON.DynamicTexture('colorBars', {width:size, height:size*0.75}, scene, false);
+  const ctx=tex.getContext();
+  // SMPTE bars
+  const colors=['#FFFFFF','#FFFF00','#00FFFF','#00FF00','#FF00FF','#FF0000','#0000FF'];
+  const w=size/colors.length;
+  colors.forEach((c,i)=>{ ctx.fillStyle=c; ctx.fillRect(i*w,0,w,size*0.68); });
+  // bottom small
+  const bottom=[
+    ['#0000FF','#000000','#FF00FF','#000000','#00FFFF','#000000','#FFFFFF'],
+    ['#001A66','#FFFFFF','#4D0073','#000000','#0A4D4D','#000000','#0A0A0A']
+  ];
+  const bh=size*0.16;
+  bottom[0].forEach((c,i)=>{ ctx.fillStyle=c; ctx.fillRect(i*w*1.0, size*0.68, w, bh); });
+  bottom[1].forEach((c,i)=>{ ctx.fillStyle=c; ctx.fillRect(i*w*0.5+size*0.15, size*0.68+bh, w*0.5, bh*0.6); });
+  // add HITACHI text
+  ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,size*0.85,size, size*0.15);
+  ctx.fillStyle='#fff'; ctx.font='bold 32px monospace'; ctx.fillText('HITACHI • AC/DC • TUBE DISCO', 20, size*0.92);
+  tex.update();
+  return tex;
+}
+
+function createScene(){
+  scene=new BABYLON.Scene(engine);
+  scene.clearColor=new BABYLON.Color4(0.06,0.06,0.08,1);
+  camera=new BABYLON.ArcRotateCamera('cam', -Math.PI/2, Math.PI/2.5, 6, new BABYLON.Vector3(0,0.3,0), scene);
+  camera.lowerRadiusLimit=2.5; camera.upperRadiusLimit=12;
+  camera.lowerBetaLimit=0.1; camera.upperBetaLimit=Math.PI-0.1;
+  camera.wheelPrecision=40;
+  camera.panningSensibility=0;
+  camera.attachControl(canvas, true);
+
+  const hemi=new BABYLON.HemisphericLight('hemi', new BABYLON.Vector3(0,1,0), scene); hemi.intensity=0.6;
+  const dir=new BABYLON.DirectionalLight('dir', new BABYLON.Vector3(-1,-1,-2), scene); dir.intensity=1.2; dir.position.set(5,8,5);
+  const rim=new BABYLON.DirectionalLight('rim', new BABYLON.Vector3(1,0.5,1), scene); rim.intensity=0.5;
+
+  // Env reflections
+  scene.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("https://assets.babylonjs.com/environments/environmentSpecular.env", scene);
+  scene.environmentIntensity=0.4;
+
+  tvRoot=new BABYLON.TransformNode('tvRoot', scene);
+
+  // Body
+  const bodyMat=new BABYLON.PBRMaterial('bodyMat', scene);
+  bodyMat.albedoColor=new BABYLON.Color3(0.82,0.82,0.84);
+  bodyMat.metallic=0.2; bodyMat.roughness=0.35;
+
+  const body=BABYLON.MeshBuilder.CreateBox('body', {width:3.6,height:2.6,depth:1.8}, scene);
+  body.parent=tvRoot; body.material=bodyMat; body.position.y=0.3;
+
+  const front=BABYLON.MeshBuilder.CreateBox('front', {width:3.7,height:2.7,depth:0.22}, scene);
+  front.parent=tvRoot; front.position.set(0,0.3,0.95); front.material=bodyMat;
+
+  // Screen curved
+  colorBarTex=createColorBarTexture(scene);
+  screenMat=new BABYLON.PBRMaterial('screenMat', scene);
+  screenMat.albedoColor=new BABYLON.Color3(0,0,0);
+  screenMat.emissiveTexture=colorBarTex;
+  screenMat.emissiveColor=new BABYLON.Color3(1,1,1);
+  screenMat.roughness=0.2; screenMat.metallic=0;
+
+  // Curved plane using sphere segment
+  screenMesh=BABYLON.MeshBuilder.CreatePlane('screen', {width:2.8,height:2.05, subdivisions:20}, scene);
+  screenMesh.parent=tvRoot;
+  screenMesh.position.set(0,0.45,1.07);
+  // bend vertices
+  const positions=screenMesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+  for(let i=0;i<positions.length;i+=3){
+    const x=positions[i], y=positions[i+1];
+    const bulge=0.18*(x*x + y*y*0.7);
+    positions[i+2]-=bulge;
+  }
+  screenMesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+  screenMesh.material=screenMat;
+  screenMesh.isPickable=false;
+
+  // Screen glass frame black
+  const frameMat=new BABYLON.PBRMaterial('frameMat', scene);
+  frameMat.albedoColor=new BABYLON.Color3(0.06,0.06,0.08); frameMat.roughness=0.7; frameMat.metallic=0.1;
+  const frame=BABYLON.MeshBuilder.CreateBox('frame', {width:3.1,height:2.25,depth:0.05}, scene);
+  frame.parent=tvRoot; frame.position.set(0,0.45,1.04); frame.material=frameMat;
+  // use stencil to have hole? simple: frame is behind screen with larger size, screen on top
+  // add inner bezel via torus? skip
+
+  // Bottom equalizer grill (disco on TV)
+  const grillMat=new BABYLON.PBRMaterial('grillMat', scene); grillMat.albedoColor=new BABYLON.Color3(0.15,0.15,0.16); grillMat.metallic=0.4; grillMat.roughness=0.6;
+  const grill=BABYLON.MeshBuilder.CreateBox('grill', {width:3.4,height:0.55,depth:0.15}, scene);
+  grill.parent=tvRoot; grill.position.set(0,-0.75,1.05); grill.material=grillMat;
+
+  // 15 bars on TV
+  tvBars=[];
+  for(let i=0;i<15;i++){
+    const barMat=new BABYLON.StandardMaterial('barMat'+i, scene);
+    barMat.emissiveColor=new BABYLON.Color3(0.1,0.4,1);
+    barMat.disableLighting=true;
+    const bar=BABYLON.MeshBuilder.CreateBox('tvBar'+i, {width:0.12,height:0.4,depth:0.02}, scene);
+    bar.parent=tvRoot;
+    bar.position.set(-1.35 + i*0.19, -0.75, 1.14);
+    bar.material=barMat;
+    bar.scaling.y=0.2;
+    tvBars.push(bar);
+  }
+
+  // Bottom knobs / text HITACHI
+  const hitachiMat=new BABYLON.PBRMaterial('hitachiMat', scene); hitachiMat.albedoColor=new BABYLON.Color3(0.9,0.9,0.9);
+  const logoPlane=BABYLON.MeshBuilder.CreatePlane('logo', {width:0.6,height:0.18}, scene);
+  logoPlane.parent=tvRoot; logoPlane.position.set(1.2,-0.75,1.13);
+  const logoTex=new BABYLON.DynamicTexture('logoTex', {width:512,height:128}, scene);
+  const lctx=logoTex.getContext(); lctx.clearRect(0,0,512,128); lctx.fillStyle='#fff'; lctx.font='bold 60px Syne'; lctx.fillText('HITACHI',20,90);
+  logoTex.update(); const logoMat=new BABYLON.StandardMaterial('logoMat', scene); logoMat.diffuseTexture=logoTex; logoMat.emissiveTexture=logoTex; logoMat.emissiveColor=new BABYLON.Color3(1,1,1);
+  logoPlane.material=logoMat;
+
+  // Ground reflection
+  const ground=BABYLON.MeshBuilder.CreateGround('ground', {width:12,height:12}, scene);
+  const gMat=new BABYLON.PBRMaterial('gMat', scene); gMat.albedoColor=new BABYLON.Color3(0.05,0.05,0.06); gMat.metallic=0.8; gMat.roughness=0.25;
+  ground.material=gMat; ground.position.y=-1.4; ground.receiveShadows=true;
+
+  engine.hideLoadingUI();
+  document.getElementById('loading').style.display='none';
+
+  // overlay tracking
+  scene.onBeforeRenderObservable.add(trackOverlay);
+
+  return scene;
+}
+
+function trackOverlay(){
+  if(!screenMesh || !camera) return;
+  const overlay=document.getElementById('ytOverlay');
+  if(overlay.style.display==='none') return;
+  // get 4 corners of screen in world
+  const halfW=1.4, halfH=1.025;
+  const localCorners=[
+    new BABYLON.Vector3(-halfW, halfH, 0),
+    new BABYLON.Vector3(halfW, halfH, 0),
+    new BABYLON.Vector3(halfW, -halfH, 0),
+    new BABYLON.Vector3(-halfW, -halfH, 0),
+  ];
+  const worldMat=screenMesh.getWorldMatrix();
+  const engineW=engine.getRenderWidth(), engineH=engine.getRenderHeight();
+  const projected=[];
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  let behind=false;
+  localCorners.forEach(lc=>{
+    const wc=BABYLON.Vector3.TransformCoordinates(lc, worldMat);
+    const p=BABYLON.Vector3.Project(wc, BABYLON.Matrix.Identity(), scene.getTransformMatrix(), camera.viewport.toGlobal(engineW, engineH));
+    if(p.z<0 || p.z>1) behind=true;
+    projected.push(p);
+    minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y);
+  });
+  // facing check
+  const toCam=camera.position.subtract(screenMesh.getAbsolutePosition()).normalize();
+  const normal=screenMesh.getDirection(BABYLON.Axis.Z);
+  const dot=BABYLON.Vector3.Dot(normal, toCam);
+  if(dot<0.15 || behind || (maxX-minX)<40 || (maxY-minY)<30){
+    overlay.style.opacity='0';
+    overlay.style.pointerEvents='none';
+    return;
+  }
+  overlay.style.opacity='1';
+  overlay.style.left = minX+'px';
+  overlay.style.top = minY+'px';
+  overlay.style.width = (maxX-minX)+'px';
+  overlay.style.height = (maxY-minY)+'px';
+  overlay.style.display='block';
+}
+
+createScene();
+engine.runRenderLoop(()=>{ if(scene) scene.render(); });
+window.addEventListener('resize', ()=>engine.resize());
+
+// ---------- AUDIO ----------
+function setupAudioGraph(mediaEl){
+  try{
+    if(audioContext) audioContext.close();
+  }catch(e){}
+  audioContext=new (window.AudioContext||window.webkitAudioContext)();
+  const src=audioContext.createMediaElementSource(mediaEl);
+  analyser=audioContext.createAnalyser();
+  analyser.fftSize=256;
+  analyser.smoothingTimeConstant=0.8;
+  let prev=src;
+  filters=[];
+  frequencies.forEach((freq,i)=>{
+    const f=audioContext.createBiquadFilter();
+    f.type='peaking'; f.frequency.value=freq; f.Q.value=1.2; f.gain.value=eqValues[i];
+    prev.connect(f); prev=f; filters.push(f);
+  });
+  prev.connect(analyser);
+  analyser.connect(audioContext.destination);
+  isFakeAudio=false;
+}
+function setupFakeAudio(){
+  try{ if(audioContext) audioContext.close(); }catch(e){}
+  audioContext=new (window.AudioContext||window.webkitAudioContext)();
+  analyser=audioContext.createAnalyser();
+  analyser.fftSize=256;
+  // no source, will fallback to fake
+  isFakeAudio=true; filters=[];
+  // create dummy filters for UI still works
+  frequencies.forEach((freq,i)=>{
+    const f=audioContext.createBiquadFilter();
+    f.type='peaking'; f.frequency.value=freq; f.Q.value=1; f.gain.value=eqValues[i];
+    filters.push(f);
+  });
+}
+
+// ---------- DISCO RENDER ----------
+const discoCanvas=document.getElementById('discoCanvas');
+const dCtx=discoCanvas.getContext('2d');
+let lastFpsTime=performance.now(), frames=0;
+
+function updateTVBars(freqData){
+  if(!tvBars.length) return;
+  for(let i=0;i<tvBars.length;i++){
+    let v;
+    if(freqData && !isFakeAudio){
+      const idx=Math.floor(i/freqData.length* freqData.length * 1.2);
+      v = freqData[Math.min(idx,freqData.length-1)]/255;
+    }else{
+      const t=Date.now()*0.001;
+      v = 0.25 + 0.6*Math.abs(Math.sin(t*2 + i*0.6)) + Math.random()*0.15;
+      if(i<3) v*=1.3;
+    }
+    const scale=0.15 + v*2.2;
+    tvBars[i].scaling.y=scale;
+    tvBars[i].position.y=-0.75 -0.1 + scale*0.15;
+    const hue=(i*22 + Date.now()*0.03)%360;
+    const c=BABYLON.Color3.FromHSV(hue/360, 0.9, 0.9+ v*0.4);
+    tvBars[i].material.emissiveColor=c;
+  }
+}
+
+function renderDisco(){
+  const W=discoCanvas.width, H=discoCanvas.height;
+  dCtx.clearRect(0,0,W,H);
+  // bg grid
+  dCtx.fillStyle='rgba(0,0,0,0.4)'; dCtx.fillRect(0,0,W,H);
+  let data=null;
+  if(analyser){
+    const tmp=new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(tmp);
+    const sum=tmp.reduce((a,b)=>a+b,0);
+    if(sum>20 && !isFakeAudio) data=tmp;
+  }
+  const barCount=32;
+  const barW=W/barCount*0.68, gap=W/barCount*0.32;
+  for(let i=0;i<barCount;i++){
+    let v;
+    if(data){
+      const idx=Math.floor((i/barCount)*data.length);
+      v=data[idx]/255;
+    }else{
+      const t=Date.now()*0.001;
+      const bass=Math.sin(t*3)*0.5+0.5;
+      v=0.2+0.55*Math.abs(Math.sin(t* (1.2+i*0.12) + i))* (0.8 + bass*0.6 * (i<6?1.5:0.6)) + Math.random()*0.08;
+      v=Math.min(1,v);
+    }
+    const h=v*H*0.88;
+    const x=i*(barW+gap)+gap*0.5;
+    const y=H-h;
+    const hue=(i*11 + Date.now()*0.02)%360;
+    const grad=dCtx.createLinearGradient(x,y,x,H);
+    grad.addColorStop(0, `hsl(${hue},100%,68%)`);
+    grad.addColorStop(0.5, `hsl(${hue},100%,55%)`);
+    grad.addColorStop(1, `hsl(${hue},90%,35%)`);
+    dCtx.fillStyle=grad;
+    dCtx.shadowColor=`hsl(${hue},100%,60%)`;
+    dCtx.shadowBlur=18 * v;
+    dCtx.fillRect(x,y,barW,h);
+    dCtx.shadowBlur=0;
+    // reflection
+    dCtx.globalAlpha=0.18;
+    dCtx.fillRect(x, H-h*0.25, barW, h*0.25);
+    dCtx.globalAlpha=1;
+  }
+  updateTVBars(data);
+  frames++;
+  const now=performance.now();
+  if(now-lastFpsTime>1000){
+    document.getElementById('fps').textContent=Math.round(frames*1000/(now-lastFpsTime))+' FPS';
+    frames=0; lastFpsTime=now;
+  }
+  requestAnimationFrame(renderDisco);
+}
+renderDisco();
+
+// ---------- YOUTUBE LOGIC ----------
+function parseYouTubeId(url){
+  if(!url) return null;
+  const reg=/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/;
+  const m=url.match(reg);
+  if(m) return m[1];
+  if(url.length===11) return url;
+  return null;
+}
+function loadYTScript(){
+  if(window.YT) return;
+  const tag=document.createElement('script'); tag.src='https://www.youtube.com/iframe_api'; document.body.appendChild(tag);
+}
+function createYTPlayer(videoId){
+  const overlay=document.getElementById('ytOverlay');
+  overlay.style.display='block';
+  if(ytPlayer && ytPlayer.loadVideoById){
+    ytPlayer.loadVideoById(videoId);
+    ytPlayer.playVideo();
+    return;
+  }
+  ytPlayer=new YT.Player('ytPlayer', {
+    height:'100%', width:'100%',
+    videoId:videoId,
+    playerVars:{autoplay:1, controls:1, modestbranding:1, rel:0, enablejsapi:1, playsinline:1},
+    events:{
+      onReady:(e)=>{ e.target.playVideo(); setupFakeAudio(); },
+      onStateChange:(e)=>{ if(e.data===1 && audioContext && audioContext.state==='suspended') audioContext.resume(); }
+    }
+  });
+}
+
+async function tryRealVideo(videoId){
+  const videoEl=document.getElementById('realVideo');
+  videoEl.pause();
+  videoEl.removeAttribute('src');
+  videoEl.load();
+  const instances=[
+    'https://inv.nadeko.net',
+    'https://invidious.nerdvpn.de',
+    'https://yewtu.be',
+    'https://inv.tux.pizza'
+  ];
+  for(const inst of instances){
+    try{
+      const url=`${inst}/latest_version?id=${videoId}&itag=18`;
+      videoEl.src=url;
+      videoEl.crossOrigin='anonymous';
+      const playPromise=videoEl.play();
+      if(playPromise) await playPromise.catch(()=>{});
+      await new Promise((res,rej)=>{
+        let done=false;
+        const to=setTimeout(()=>{ if(!done){ done=true; rej('timeout'); } }, 2500);
+        videoEl.oncanplay=()=>{ if(!done){ done=true; clearTimeout(to); res(); } };
+        videoEl.onerror=()=>{ if(!done){ done=true; clearTimeout(to); rej('error'); } };
+      });
+      if(videoEl.readyState>=2 && !videoEl.error){
+        return true;
+      }
+    }catch(e){ /* continue */ }
+  }
+  return false;
+}
+
+document.getElementById('playBtn').addEventListener('click', async ()=>{
+  const raw=document.getElementById('ytInput').value.trim();
+  const id=parseYouTubeId(raw);
+  if(!id){ alert('Link YouTube tidak valid Bro! Contoh: https://youtu.be/dQw4w9WgXcQ'); return; }
+  currentVideoId=id;
+  document.getElementById('loading').textContent='LOADING VIDEO '+id+'...'; document.getElementById('loading').style.display='block';
+  const realOk=await tryRealVideo(id);
+  document.getElementById('loading').style.display='none';
+  if(realOk){
+    const videoEl=document.getElementById('realVideo');
+    document.getElementById('ytOverlay').style.display='none';
+    const vidTex=new BABYLON.VideoTexture('vidTex', videoEl, scene, true, true);
+    screenMat.emissiveTexture=vidTex;
+    screenMat.diffuseTexture=vidTex;
+    setupAudioGraph(videoEl);
+    if(audioContext.state==='suspended') await audioContext.resume();
+  }else{
+    // fallback iframe
+    screenMat.emissiveTexture=colorBarTex;
+    createYTPlayer(id);
+    setupFakeAudio();
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  BABYLON.Animation.CreateAndStartAnimation('camAlpha', camera, 'alpha', 60, 30, camera.alpha, -Math.PI/2, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+  BABYLON.Animation.CreateAndStartAnimation('camBeta', camera, 'beta', 60, 30, camera.beta, Math.PI/2.5, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+  BABYLON.Animation.CreateAndStartAnimation('camRad', camera, 'radius', 60, 30, camera.radius, 6, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+});
+document.getElementById('fullscreenBtn').addEventListener('click', ()=>{
+  if(!document.fullscreenElement) document.getElementById('canvasContainer').requestFullscreen();
+  else document.exitFullscreen();
+});
+document.getElementById('testBtn').addEventListener('click', async ()=>{
+  setupFakeAudio();
+  if(audioContext.state==='suspended') await audioContext.resume();
+  // play oscillator test
+  const osc=audioContext.createOscillator(); const gain=audioContext.createGain();
+  osc.type='sawtooth'; osc.frequency.value=60; gain.gain.value=0.2;
+  osc.connect(gain); gain.connect(analyser);
+  osc.start(); setTimeout(()=>{ osc.stop(); gain.disconnect(); }, 4000);
+  alert('Test disco jalan! Ini mode fake-reactive. Masukkan YouTube link untuk coba real.');
+});
+
+// auto load sample?
+window.addEventListener('load', ()=>{
+  // prefill with sample lofi
+  document.getElementById('ytInput').value='https://youtu.be/5qap5aO4i9A';
+});
+</script>
+</body>
+</html>
