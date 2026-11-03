@@ -160,30 +160,7 @@
             <div class="lg:col-span-7 glass-card p-5 rounded-2xl flex flex-col justify-between border border-gold/20">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                     <h2 class="text-sm font-bold text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders"></i> EQUALIZER 15-BAND (PRESETS)
-                    </h2>
-                    <span id="audioStatusBadge" class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        <i class="fa-solid fa-volume-high"></i> Audio Aktif
-                    </span>
-                </div>
-
-                <!-- Disco LED Canvas Visualizer -->
-                <div class="relative w-full h-[220px] bg-slate-950 rounded-xl p-2 border border-slate-800 overflow-hidden flex items-center justify-center">
-                    <canvas id="visualizerCanvas" class="w-full h-full"></canvas>
-                </div>
-
-                <div class="mt-3 flex justify-between items-center text-xs text-slate-400 px-1">
-                    <span>50Hz (Sub Bass)</span>
-                    <span class="text-amber-400/80 font-mono">15-BAND REAL FFT</span>
-                    <span>20kHz (Treble)</span>
-                </div>
-            </div>
-
-            <!-- Right Panel: 15-Band Equalizer & Preset Manager -->
-            <div class="lg:col-span-7 glass-card p-5 rounded-2xl flex flex-col justify-between border border-gold/20">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                    <h2 class="text-sm font-bold text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders"></i> EQUALIZER 15-BAND (BIQUAD FILTERS)
+                        <i class="fa-solid fa-sliders"></i> EQUALIZER 15-BAND
                     </h2>
 
                     <!-- Presets Selector & Custom Save -->
@@ -217,7 +194,7 @@
                 </div>
 
                 <div class="mt-2 text-right">
-                    <span class="text-[11px] text-slate-400">Rentang Gain: -12dB hingga +12dB (Realtime DSP)</span>
+                    <span class="text-[11px] text-slate-400">Rentang Gain: -12dB hingga +12dB (Visual Modulation)</span>
                 </div>
             </div>
         </section>
@@ -445,10 +422,14 @@
 
         function resetTVRotation() {
             if (!camera) return;
-            BABYLON.Animation.CreateAndStartAnimation('camResetAlpha', camera, 'alpha', 30, 15, camera.alpha, Math.PI / 2, 0);
-            BABYLON.Animation.CreateAndStartAnimation('camResetBeta', camera, 'beta', 30, 15, camera.beta, Math.PI / 2.3, 0);
-            BABYLON.Animation.CreateAndStartAnimation('camResetRad', camera, 'radius', 30, 15, camera.radius, 12, 0);
+            // Stop current camera animations if any to avoid continuous spinning
+            scene.stopAnimation(camera);
+            
+            // Instantly reset target and smoothly set coordinates
             camera.setTarget(BABYLON.Vector3.Zero());
+            camera.alpha = Math.PI / 2;
+            camera.beta = Math.PI / 2.3;
+            camera.radius = 12;
         }
 
         // --- DISCO LED SPECTRUM VISUALIZER ---
