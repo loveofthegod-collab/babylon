@@ -87,26 +87,20 @@
                 <h1 class="text-xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-600 bg-clip-text text-transparent">
                     LUXURY 3D CRT STUDIO
                 </h1>
-                <p class="text-xs text-slate-400">Babylon.js 360° Tube TV & Real Web Audio 15-Band Equalizer</p>
+                <p class="text-xs text-slate-400">Babylon.js 360° Tube TV & Embedded YouTube Player</p>
             </div>
         </div>
 
-        <!-- Media / YouTube & Sample Controls -->
+        <!-- Media / YouTube Input Controls -->
         <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-            <!-- Sample Track Selector for Real Web Audio Analyser -->
-            <select id="sampleAudioSelect" class="bg-slate-900 border border-gold/40 text-amber-300 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-gold">
-                <option value="https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg">🎵 Demo Track 1: Electronic Synth</option>
-                <option value="https://upload.wikimedia.org/wikipedia/commons/b/b2/Beethoven_Moonlight_1st_movement.ogg">🎻 Demo Track 2: Classical Piano</option>
-                <option value="https://commondatastorage.googleapis.com/codeskulptor-demos/ricercar.ogg">🎶 Demo Track 3: Baroque Instrumental</option>
-            </select>
-
-            <div class="relative w-full sm:w-80">
+            <div class="relative w-full sm:w-96">
                 <i class="fa-brands fa-youtube absolute left-3 top-1/2 -translate-y-1/2 text-red-500 text-lg"></i>
-                <input type="text" id="ytUrlInput" placeholder="Atau paste link YouTube..." 
+                <input type="text" id="ytUrlInput" placeholder="Masukkan link YouTube (contoh: https://www.youtube.com/watch?v=7dEYo1qOm0U)" 
+                       value="https://www.youtube.com/watch?v=7dEYo1qOm0U"
                        class="w-full pl-10 pr-4 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs focus:outline-none focus:border-gold text-slate-200">
             </div>
             <button id="btnPlayMedia" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-semibold text-xs rounded-xl transition-all shadow-md shadow-amber-500/20 flex items-center gap-2 whitespace-nowrap">
-                <i class="fa-solid fa-play"></i> Putar Audio / Video
+                <i class="fa-solid fa-play"></i> Putar Video YouTube
             </button>
         </div>
     </header>
@@ -115,13 +109,13 @@
     <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
         <!-- 3D Babylon Viewport Container -->
-        <section class="lg:col-span-12 relative w-full h-[380px] sm:h-[460px] lg:h-[500px] rounded-2xl overflow-hidden glass-card border border-gold/20 shadow-2xl">
+        <section id="viewportContainer" class="lg:col-span-12 relative w-full h-[380px] sm:h-[460px] lg:h-[500px] rounded-2xl overflow-hidden glass-card border border-gold/20 shadow-2xl">
             <!-- Canvas Babylon -->
             <canvas id="renderCanvas" class="w-full h-full outline-none touch-none"></canvas>
 
-            <!-- Hidden Audio/Video Element for Real Audio Context Processing -->
-            <div class="hidden">
-                <audio id="audioElement" crossorigin="anonymous" controls></audio>
+            <!-- Embedded 3D Screen Overlay Iframe -->
+            <div id="tvIframeContainer" class="absolute pointer-events-auto transition-transform duration-75 ease-out rounded-lg overflow-hidden bg-black shadow-2xl border border-slate-800" style="width: 520px; height: 380px; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
+                <iframe id="ytIframe" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
             <!-- Overlay Control Floating Buttons -->
@@ -143,7 +137,30 @@
             <div class="lg:col-span-5 glass-card p-5 rounded-2xl flex flex-col justify-between border border-gold/20">
                 <div class="flex justify-between items-center mb-3">
                     <h2 class="text-sm font-bold text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-simple"></i> SPEKTRUM DISCO LED (REAL ANALYSER)
+                        <i class="fa-solid fa-chart-simple"></i> SPEKTRUM DISCO LED
+                    </h2>
+                    <span id="audioStatusBadge" class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        <i class="fa-solid fa-compact-disc animate-spin"></i> Disco Mode
+                    </span>
+                </div>
+
+                <!-- Disco LED Canvas Visualizer -->
+                <div class="relative w-full h-[220px] bg-slate-950 rounded-xl p-2 border border-slate-800 overflow-hidden flex items-center justify-center">
+                    <canvas id="visualizerCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <div class="mt-3 flex justify-between items-center text-xs text-slate-400 px-1">
+                    <span>50Hz (Sub Bass)</span>
+                    <span class="text-amber-400/80 font-mono">15-BAND SPECTRUM</span>
+                    <span>20kHz (Treble)</span>
+                </div>
+            </div>
+
+            <!-- Right Panel: 15-Band Equalizer & Preset Manager -->
+            <div class="lg:col-span-7 glass-card p-5 rounded-2xl flex flex-col justify-between border border-gold/20">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h2 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> EQUALIZER 15-BAND (PRESETS)
                     </h2>
                     <span id="audioStatusBadge" class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                         <i class="fa-solid fa-volume-high"></i> Audio Aktif
@@ -241,15 +258,8 @@
         let customPresets = JSON.parse(localStorage.getItem('customEqPresets') || '{}');
         let currentEqValues = [...PRESETS.flat];
 
-        // Web Audio API Variables
-        let audioCtx = null;
-        let audioSourceNode = null;
-        let analyser = null;
-        let eqFilters = [];
-        let isAudioInitialized = false;
-
-        // Babylon.js Variables
-        let canvas, engine, scene, camera, tvMainMesh, tvScreenDynamicTexture;
+        // Babylon.js & UI Variables
+        let canvas, engine, scene, camera, tvMainMesh, screenPlane;
 
         // --- EQUALIZER UI INITIALIZATION ---
         function initEqualizerUI() {
@@ -276,11 +286,6 @@
                     const val = parseFloat(e.target.value);
                     currentEqValues[idx] = val;
                     document.getElementById(`eq-val-${idx}`).innerText = (val > 0 ? `+${val}` : `${val}`) + 'dB';
-                    
-                    if (eqFilters[idx]) {
-                        eqFilters[idx].gain.setValueAtTime(val, audioCtx.currentTime);
-                    }
-
                     document.getElementById('presetSelect').value = 'custom_unsaved';
                     updateDeleteButtonState();
                 });
@@ -323,9 +328,6 @@
             document.querySelectorAll('.eq-slider').forEach((slider, idx) => {
                 slider.value = currentEqValues[idx];
                 document.getElementById(`eq-val-${idx}`).innerText = (currentEqValues[idx] > 0 ? `+${currentEqValues[idx]}` : `${currentEqValues[idx]}`) + 'dB';
-                if (eqFilters[idx] && audioCtx) {
-                    eqFilters[idx].gain.setValueAtTime(currentEqValues[idx], audioCtx.currentTime);
-                }
             });
 
             updateDeleteButtonState();
@@ -341,42 +343,7 @@
             }
         }
 
-        // --- WEB AUDIO API SETUP ---
-        function setupAudioChain() {
-            if (isAudioInitialized) return;
-
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-
-            const audioElement = document.getElementById('audioElement');
-            audioSourceNode = audioCtx.createMediaElementSource(audioElement);
-
-            // Analyser for Visualizer
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-
-            // Create 15 BiquadFilterNodes
-            let lastNode = audioSourceNode;
-            eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'peaking';
-                filter.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                filter.Q.setValueAtTime(1.4, audioCtx.currentTime);
-                filter.gain.setValueAtTime(currentEqValues[idx], audioCtx.currentTime);
-
-                lastNode.connect(filter);
-                lastNode = filter;
-                return filter;
-            });
-
-            // Connect chain to analyser and destination
-            lastNode.connect(analyser);
-            analyser.connect(audioCtx.destination);
-
-            isAudioInitialized = true;
-        }
-
-        // --- BABYLON.JS 3D TV SCENE ---
+        // --- BABYLON.JS 3D TV SCENE WITH 3D OVERLAY SYNC ---
         function initBabylonScene() {
             canvas = document.getElementById('renderCanvas');
             engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
@@ -417,21 +384,18 @@
             bezel.parent = tvMainMesh;
             bezel.material = bezelMat;
 
-            // Screen Plane
-            const tvScreen = BABYLON.MeshBuilder.CreatePlane("tvScreen", { width: 5.2, height: 3.8 }, scene);
-            tvScreen.position.z = -1.96;
-            tvScreen.parent = tvMainMesh;
+            // Screen Plane Mesh
+            screenPlane = BABYLON.MeshBuilder.CreatePlane("tvScreen", { width: 5.2, height: 3.8 }, scene);
+            screenPlane.position.z = -1.96;
+            screenPlane.parent = tvMainMesh;
 
-            tvScreenDynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", { width: 1024, height: 768 }, scene, true);
             const screenMat = new BABYLON.StandardMaterial("screenMat", scene);
-            screenMat.diffuseTexture = tvScreenDynamicTexture;
-            screenMat.emissiveTexture = tvScreenDynamicTexture;
-            tvScreen.material = screenMat;
-
-            drawScreenStandbyPattern("LUXURY CRT TV", "Pilih Audio/Video di Atas untuk Memulai");
+            screenMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+            screenPlane.material = screenMat;
 
             engine.runRenderLoop(() => {
                 scene.render();
+                updateIframePosition();
             });
 
             window.addEventListener('resize', () => {
@@ -439,31 +403,44 @@
             });
         }
 
-        function drawScreenStandbyPattern(title, subtitle) {
-            const ctx = tvScreenDynamicTexture.getContext();
-            const w = 1024, h = 768;
+        // Sync iframe rotation & scale with 3D Screen Plane position
+        function updateIframePosition() {
+            const iframeContainer = document.getElementById('tvIframeContainer');
+            if (!screenPlane || iframeContainer.style.display === 'none') return;
 
-            const colors = ['#c0c0c0', '#c0c000', '#00c0c0', '#00c000', '#c000c0', '#c00000', '#0000c0'];
-            const barW = w / colors.length;
+            const worldMatrix = screenPlane.getWorldMatrix();
+            const transformMatrix = scene.getTransformMatrix();
+            const viewport = camera.viewport;
 
-            colors.forEach((col, i) => {
-                ctx.fillStyle = col;
-                ctx.fillRect(i * barW, 0, barW, h * 0.75);
-            });
+            const screenPos = BABYLON.Vector3.Project(
+                BABYLON.Vector3.Zero(),
+                worldMatrix,
+                transformMatrix,
+                viewport
+            );
 
-            ctx.fillStyle = '#080b11';
-            ctx.fillRect(0, h * 0.75, w, h * 0.25);
+            const canvasWidth = engine.getRenderWidth();
+            const canvasHeight = engine.getRenderHeight();
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'Bold 42px Inter';
-            ctx.textAlign = 'center';
-            ctx.fillText(title, w / 2, h * 0.84);
+            const x = screenPos.x * canvasWidth;
+            const y = screenPos.y * canvasHeight;
 
-            ctx.fillStyle = '#D4AF37';
-            ctx.font = '26px Inter';
-            ctx.fillText(subtitle, w / 2, h * 0.92);
+            // Calculate camera angle relative to front
+            const angleY = camera.alpha - Math.PI / 2;
+            const angleX = camera.beta - Math.PI / 2.3;
 
-            tvScreenDynamicTexture.update();
+            // Hide iframe if rotated to back of TV
+            const cosAlpha = Math.cos(camera.alpha);
+            if (cosAlpha < -0.2) {
+                iframeContainer.style.opacity = '0';
+                iframeContainer.style.pointerEvents = 'none';
+            } else {
+                iframeContainer.style.opacity = '1';
+                iframeContainer.style.pointerEvents = 'auto';
+            }
+
+            const scale = Math.max(0.3, 12 / camera.radius);
+            iframeContainer.style.transform = `translate(-50%, -50%) translate3d(${x - canvasWidth / 2}px, ${y - canvasHeight / 2}px, 0px) rotateY(${angleY}rad) rotateX(${-angleX}rad) scale(${scale})`;
         }
 
         function resetTVRotation() {
@@ -503,20 +480,14 @@
 
             const numBars = 32;
             const barWidth = (w / numBars) - 3;
-            let freqData = new Uint8Array(numBars);
-
-            if (analyser && isAudioInitialized) {
-                analyser.getByteFrequencyData(freqData);
-            } else {
-                const time = Date.now() * 0.005;
-                for (let i = 0; i < numBars; i++) {
-                    const noise = Math.sin(time + i * 0.3) * 0.5 + 0.5;
-                    freqData[i] = Math.floor(noise * 120 + 20);
-                }
-            }
+            const time = Date.now() * 0.005;
 
             for (let i = 0; i < numBars; i++) {
-                const barHeight = (freqData[i] / 255) * (h - 10);
+                // Apply current EQ values to modulate visualizer bar dynamic height
+                const eqOffset = (currentEqValues[Math.floor(i / 2)] || 0) * 4;
+                const noise = Math.sin(time + i * 0.3) * 0.5 + 0.5;
+                const barHeight = Math.min(h - 10, Math.max(15, (noise * 140 + 30) + eqOffset));
+
                 const x = i * (barWidth + 3) + 2;
                 const segments = 16;
 
@@ -538,23 +509,25 @@
             }
         }
 
-        // --- MEDIA PLAYBACK HANDLING ---
+        // --- YOUTUBE LINK CONVERTER & EMBED MEDIA ---
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         function playSelectedMedia() {
-            setupAudioChain();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            const rawUrl = document.getElementById('ytUrlInput').value.trim();
+            const videoId = extractYouTubeId(rawUrl);
 
-            const audioElement = document.getElementById('audioElement');
-            const ytUrl = document.getElementById('ytUrlInput').value.trim();
-            const sampleUrl = document.getElementById('sampleAudioSelect').value;
+            const iframeContainer = document.getElementById('tvIframeContainer');
+            const iframe = document.getElementById('ytIframe');
 
-            if (ytUrl) {
-                drawScreenStandbyPattern("YOUTUBE STREAM", "Memuat Audio/Video...");
+            if (videoId) {
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+                iframeContainer.style.display = 'block';
             } else {
-                audioElement.src = sampleUrl;
-                audioElement.play().catch(e => console.log("Autoplay prevented:", e));
-                drawScreenStandbyPattern("DEMO AUDIO DIPUTAR", "Equalizer 15-Band & LED Aktif");
+                alert("Link YouTube tidak valid. Harap masukkan URL YouTube yang benar.");
             }
         }
 
@@ -570,6 +543,9 @@
             document.getElementById('presetSelect').addEventListener('change', (e) => {
                 applyPreset(e.target.value);
             });
+
+            // Auto-load default YouTube video on load
+            playSelectedMedia();
 
             // Preset Modal Flow
             const modal = document.getElementById('presetModal');
