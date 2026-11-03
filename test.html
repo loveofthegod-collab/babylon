@@ -3,98 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TUBE DISCO 3D - HITACHI ELITE V2 FIX</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>TUBE DISCO 3D - HITACHI V3 REAL TUBE</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
 <script src="https://cdn.babylonjs.com/babylon.js"></script>
 <style>
-:root{--gold:#D4AF37;--gold2:#FFE27A;--bg:#09090B;--border:rgba(212,175,55,0.24);--text:#E9E5D6}
+:root{--gold:#D4AF37;--gold2:#FFE27A;--bg:#08080A;--border:rgba(212,175,55,0.28);--text:#E8E2D0}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#09090B;color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
-header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:rgba(10,10,12,0.9);position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)}
-.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.02em}
-.brand span{color:var(--gold)}
-.badge{font-size:10px;letter-spacing:0.18em;border:1px solid var(--border);padding:6px 10px;border-radius:999px;color:var(--gold);background:rgba(212,175,55,0.1)}
-#canvasWrap{position:relative;width:100%;height:64vh;min-height:480px;max-height:800px;background:radial-gradient(800px 400px at 50% 0%, rgba(212,175,55,0.08), transparent), radial-gradient(600px 300px at 80% 100%, rgba(120,80,255,0.08), transparent), #0F0F12;border-bottom:1px solid var(--border);overflow:hidden}
-#renderCanvas{width:100%;height:100%;display:block;touch-action:none}
-#ytOverlay{
-  position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);
-  width:46%;height:42%;max-width:560px;max-height:360px;
-  background:#000;border-radius:10px;overflow:hidden;
-  box-shadow:0 0 0 2px rgba(212,175,55,0.25) inset, 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(212,175,55,0.15);
-  display:none;z-index:5;
-  transition:opacity 0.3s, width 0.2s, height 0.2s, left 0.15s, top 0.15s;
+body{background:#08080A;color:var(--text);font-family:'Space Grotesk',sans-serif}
+header{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:rgba(12,12,14,0.9);position:sticky;top:0;z-index:20}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:19px} .brand b{color:var(--gold)}
+.badge{font-size:10px;letter-spacing:0.16em;border:1px solid var(--border);padding:5px 9px;border-radius:999px;color:var(--gold);background:rgba(212,175,55,0.12)}
+#wrap{position:relative;width:100%;height:66vh;min-height:520px;background:radial-gradient(900px 400px at 50% 0%, rgba(212,175,55,0.10), transparent), #0E0E11;border-bottom:1px solid var(--border);overflow:hidden}
+#renderCanvas{width:100%;height:100%;display:block;touch-action:none;outline:none}
+#ytBox{
+ position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);
+ width:1px;height:1px;background:#000;border-radius:8px;overflow:hidden;
+ box-shadow:0 0 0 2px rgba(212,175,55,0.3) inset, 0 0 30px rgba(0,0,0,0.9);
+ display:none;z-index:4;
+ will-change:left,top,width,height;
 }
-#ytOverlay iframe{width:100%;height:100%;border:0}
-#ytOverlay.active{display:block}
-#scanlines{position:absolute;inset:0;pointer-events:none;z-index:6;background:repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(255,255,255,0.03) 3px);mix-blend-mode:overlay}
-#loading{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);border:1px solid var(--border);padding:10px 18px;border-radius:999px;font-size:11px;letter-spacing:0.15em;color:var(--gold2);z-index:10}
-#controlsBar{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;background:linear-gradient(180deg,#1A1A1E,#121216);border-bottom:1px solid var(--border);align-items:center}
-.yt-group{flex:1 1 420px;display:flex;gap:10px}
-.yt-group input{flex:1;background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:14px;padding:13px 14px;color:var(--text);font-size:13px;outline:none}
-.yt-group input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,0.15)}
-.btn{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#111;font-weight:700;border:0;border-radius:14px;padding:12px 16px;cursor:pointer;white-space:nowrap}
-.btn.sec{background:rgba(255,255,255,0.07);color:var(--text);border:1px solid var(--border)}
-#eqSection{display:grid;grid-template-columns:1fr 1.25fr;gap:14px;padding:14px;max-width:1600px;margin:0 auto}
-@media(max-width:900px){#eqSection{grid-template-columns:1fr} #canvasWrap{height:52vh} #ytOverlay{width:70%;height:38%}}
-.panel{background:linear-gradient(180deg,rgba(28,28,32,0.95),rgba(18,18,22,0.95));border:1px solid var(--border);border-radius:20px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,0.5);position:relative;overflow:hidden}
-.panel::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.5),transparent)}
-.panel h3{font-family:'Syne',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold2);margin-bottom:10px}
-#discoCanvas{width:100%;height:210px;display:block;border-radius:12px;background:#0A0A0C;border:1px solid rgba(255,255,255,0.06)}
-.eq-sliders{display:grid;grid-template-columns:repeat(15,1fr);gap:5px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:12px 8px 8px 8px}
-@media(max-width:700px){.eq-sliders{grid-template-columns:repeat(8,1fr)}}
-.col{display:flex;flex-direction:column;align-items:center;gap:5px}
-.col label{font-size:9px;color:rgba(255,255,255,0.5)}
-.vs{-webkit-appearance:none;width:110px;height:5px;transform:rotate(-90deg);transform-origin:55px 55px;margin:50px 0;background:linear-gradient(90deg,rgba(212,175,55,0.2),rgba(212,175,55,0.6));border-radius:999px}
-.vs::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,var(--gold2),var(--gold));box-shadow:0 2px 8px rgba(212,175,55,0.6);cursor:pointer}
-.val{font-size:10px;font-weight:600;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,0.08);min-width:32px;text-align:center}
-.val.pos{background:rgba(212,175,55,0.18);color:var(--gold2)}
-.presetRow{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.presetRow select{flex:1 1 180px;background:rgba(0,0,0,0.5);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{font-size:10px;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--border);cursor:pointer}
-.note{font-size:10px;color:rgba(255,255,255,0.4);margin-top:8px;line-height:1.4}
+#ytBox.show{display:block}
+#ytBox iframe{width:100%;height:100%;border:0;display:block}
+#scan{position:absolute;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.025) 3px)}
+#load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.75);border:1px solid var(--border);padding:10px 16px;border-radius:999px;font-size:11px;letter-spacing:0.14em;color:var(--gold2);z-index:6}
+#ctrl{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;background:#15151A;border-bottom:1px solid var(--border);align-items:center}
+.ytin{flex:1 1 380px;display:flex;gap:8px}
+.ytin input{flex:1;background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:12px;padding:11px 12px;color:var(--text);font-size:12px;outline:none}
+.btn{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#111;font-weight:800;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-size:12px}
+.btn2{background:rgba(255,255,255,0.07);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 14px;cursor:pointer;font-size:12px}
+#eq{display:grid;grid-template-columns:1fr 1.25fr;gap:12px;padding:12px;max-width:1600px;margin:0 auto}
+@media(max-width:900px){#eq{grid-template-columns:1fr} #wrap{height:54vh} }
+.panel{background:linear-gradient(180deg,#1F1F24,#18181E);border:1px solid var(--border);border-radius:18px;padding:12px;position:relative}
+.panel h3{font-family:'Syne',sans-serif;font-size:11px;letter-spacing:0.08em;color:var(--gold2);margin-bottom:8px;text-transform:uppercase}
+#disco{width:100%;height:200px;border-radius:10px;background:#0A0A0C;border:1px solid rgba(255,255,255,0.06);display:block}
+.sliders{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;background:rgba(0,0,0,0.35);border-radius:12px;padding:10px 6px 6px 6px;border:1px solid rgba(255,255,255,0.06)}
+@media(max-width:700px){.sliders{grid-template-columns:repeat(8,1fr)}}
+.col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.col label{font-size:8px;color:rgba(255,255,255,0.5)}
+.vs{-webkit-appearance:none;width:100px;height:4px;transform:rotate(-90deg);transform-origin:50px 50px;margin:45px 0;background:linear-gradient(90deg,rgba(212,175,55,0.2),rgba(212,175,55,0.7));border-radius:999px}
+.vs::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);cursor:pointer}
+.val{font-size:9px;padding:2px 5px;border-radius:999px;background:rgba(255,255,255,0.08);min-width:28px;text-align:center}
+.row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.row select{flex:1 1 160px;background:rgba(0,0,0,0.5);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-size:11px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{font-size:9px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--border);cursor:pointer}
+.note{font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px;line-height:1.4}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">TUBE <span>DISCO</span> • HITACHI ELITE V2</div>
-  <div class="badge">FIX CORS • VIDEO MUNCUL • NO 14 ERROR</div>
+ <div class="brand">TUBE <b>DISCO</b> • HITACHI ELITE V3</div>
+ <div class="badge">REAL TUBE • VIDEO DI DALAM TABUNG • NO FAKE BOX</div>
 </header>
-<div id="canvasWrap">
-  <canvas id="renderCanvas"></canvas>
-  <div id="ytOverlay"></div>
-  <div id="scanlines"></div>
-  <div id="loading">LOADING TUBE TV...</div>
+<div id="wrap">
+ <canvas id="renderCanvas"></canvas>
+ <div id="ytBox"></div>
+ <div id="scan"></div>
+ <div id="load">MEMBUAT TABUNG ASLI...</div>
 </div>
-<div id="controlsBar">
-  <div class="yt-group">
-    <input id="ytInput" placeholder="Paste YouTube link - https://youtu.be/dQw4w9WgXcQ" value="https://youtu.be/7dEYo1Qm0U">
-    <button class="btn" id="playBtn">▶ PLAY DI TUBE</button>
-  </div>
-  <button class="btn sec" id="resetBtn">↺ Reset</button>
-  <button class="btn sec" id="fsBtn">⛶ Fullscreen</button>
-  <button class="btn sec" id="discoTestBtn">♫ Test Disco</button>
+<div id="ctrl">
+ <div class="ytin">
+  <input id="ytInput" placeholder="Paste link YouTube apapun - watch?v=, youtu.be, playlist, shorts" value="https://www.youtube.com/watch?v=7dEYo1qOm0U&list=RD7dEYo1qOm0U">
+  <button class="btn" id="playBtn">▶ PLAY DI DALAM TABUNG</button>
+ </div>
+ <button class="btn2" id="resetBtn">↺ Reset Rotation</button>
+ <button class="btn2" id="fsBtn">⛶ Fullscreen</button>
+ <button class="btn2" id="testBtn">♫ Test Disco</button>
 </div>
-<div id="eqSection">
-  <div class="panel">
-    <h3>Equalizer Bar Disco Berwarna-Warni — Kiri</h3>
-    <canvas id="discoCanvas" width="640" height="210"></canvas>
-    <div class="note" id="statusNote">Status: Ready. Masukkan YouTube & PLAY. Video akan muncul di layar TV 3D (bukan cuma suara).</div>
-  </div>
-  <div class="panel">
-    <h3>Pengaturan Equalizer 15-Band — Kanan</h3>
-    <div class="presetRow">
-      <select id="presetSel"></select>
-      <button class="btn sec" id="saveBtn">+ Save Custom</button>
-      <button class="btn sec" id="flatBtn">Flat</button>
-    </div>
-    <div id="eqSliders" class="eq-sliders"></div>
-    <div class="chips" id="chips"></div>
-    <div class="note">Preset: Bass Boost, Treble Boost, Vocal/Voice, Pop, Rock/Metal, Classical/Akustik, Bright, Mellow/Relaxed, Speech, Custom. Custom bisa save banyak, disimpan di localStorage. EQ visual & filter WebAudio jalan di mode fake & real.</div>
-  </div>
+<div id="eq">
+ <div class="panel">
+  <h3>Equalizer Disco Berwarna-Warni - Kiri (di bawah TV juga ada)</h3>
+  <canvas id="disco" width="640" height="200"></canvas>
+  <div class="note" id="stat">Status: TV tabung asli siap. Video akan muncul DI DALAM kaca tabung, bukan di belakang kotak palsu. Putar TV 360° — video ikut menyempit kalau dari samping, hilang kalau dari belakang.</div>
+ </div>
+ <div class="panel">
+  <h3>Pengaturan Equalizer 15-Band - Kanan</h3>
+  <div class="row"><select id="preset"></select><button class="btn2" id="saveBtn">+ Save Custom</button><button class="btn2" id="flatBtn">Flat</button></div>
+  <div id="sliders" class="sliders"></div>
+  <div class="chips" id="chips"></div>
+  <div class="note">Preset: Bass Boost, Treble Boost, Vocal/Voice, Pop, Rock/Metal, Classical/Akustik, Bright, Mellow/Relaxed, Speech, Custom. Bisa save banyak custom (localStorage).</div>
+ </div>
 </div>
 <script>
-// ---------- EQ ----------
+// EQ setup
 const freqs=[50,100,156,220,311,440,622,880,1250,1750,2500,3500,5000,10000,20000];
 const presets={
  "Flat":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -110,215 +101,247 @@ const presets={
  "Custom":[3,3,7.3,7,3,-1,-6.6,-6.3,-4.5,-4,1.1,1.2,5.8,7.9,8.8]
 };
 let eqVals=[...presets.Custom];
-let audioCtx=null, analyser=null, filters=[];
-let isFake=true;
-const eqDiv=document.getElementById('eqSliders'), sel=document.getElementById('presetSel');
-Object.keys(presets).forEach(k=>{let o=document.createElement('option');o.value=k;o.textContent=k;sel.appendChild(o);}); sel.value='Custom';
-function buildSliders(){
- eqDiv.innerHTML='';
- freqs.forEach((f,i)=>{
-  let col=document.createElement('div');col.className='col';
-  let lab=document.createElement('label');lab.textContent=f>=1000? (f/1000)+'K':f;
-  let inp=document.createElement('input');inp.type='range';inp.min=-12;inp.max=12;inp.step=0.1;inp.value=eqVals[i];inp.className='vs';inp.dataset.i=i;
-  let val=document.createElement('div');val.className='val'+(eqVals[i]>0?' pos':'');val.textContent=eqVals[i].toFixed(1)+'dB';
-  inp.addEventListener('input',e=>{let idx=+e.target.dataset.i;let v=parseFloat(e.target.value);eqVals[idx]=v;val.textContent=v.toFixed(1)+'dB';val.classList.toggle('pos',v>0);if(filters[idx]) filters[idx].gain.value=v;});
-  col.append(lab,inp,val); eqDiv.appendChild(col);
- });
-}
+let audioCtx, analyser, filters=[], isFake=true;
+const sDiv=document.getElementById('sliders'), pSel=document.getElementById('preset');
+Object.keys(presets).forEach(k=>{let o=document.createElement('option');o.value=k;o.textContent=k;pSel.appendChild(o);}); pSel.value='Custom';
+function buildSliders(){ sDiv.innerHTML=''; freqs.forEach((f,i)=>{ let col=document.createElement('div');col.className='col'; let lab=document.createElement('label');lab.textContent=f>=1000?f/1000+'K':f; let inp=document.createElement('input');inp.type='range';inp.min=-12;inp.max=12;inp.step=0.1;inp.value=eqVals[i];inp.className='vs';inp.dataset.i=i; let val=document.createElement('div');val.className='val';val.textContent=eqVals[i].toFixed(1); inp.oninput=e=>{let idx=+e.target.dataset.i;let v=parseFloat(e.target.value);eqVals[idx]=v;val.textContent=v.toFixed(1); if(filters[idx]) filters[idx].gain.value=v;}; col.append(lab,inp,val); sDiv.appendChild(col);});}
 buildSliders();
-function applyPreset(name){ if(!presets[name]) return; eqVals=[...presets[name]]; buildSliders(); filters.forEach((f,i)=>f && (f.gain.value=eqVals[i])); }
-sel.addEventListener('change',e=>applyPreset(e.target.value));
+function applyPreset(n){ if(!presets[n])return; eqVals=[...presets[n]]; buildSliders(); filters.forEach((f,i)=>f&&(f.gain.value=eqVals[i])); }
+pSel.onchange=e=>applyPreset(e.target.value);
 document.getElementById('flatBtn').onclick=()=>applyPreset('Flat');
-function refreshChips(){
- let c=document.getElementById('chips');c.innerHTML='';let saved=JSON.parse(localStorage.getItem('tubeCustomEQ')||'{}');
- Object.keys(saved).forEach(n=>{let chip=document.createElement('div');chip.className='chip';chip.textContent='★ '+n;chip.onclick=()=>{eqVals=[...saved[n]];buildSliders();filters.forEach((f,i)=>f&&(f.gain.value=eqVals[i])); sel.value='Custom';};let del=document.createElement('span');del.textContent=' ×';del.style.color='#ff7777';del.onclick=e=>{e.stopPropagation();delete saved[n];localStorage.setItem('tubeCustomEQ',JSON.stringify(saved));refreshChips();};chip.appendChild(del);c.appendChild(chip);});
-}
+function refreshChips(){ let c=document.getElementById('chips');c.innerHTML='';let saved=JSON.parse(localStorage.getItem('tubeCustomEQ')||'{}'); Object.keys(saved).forEach(name=>{ let chip=document.createElement('div');chip.className='chip';chip.textContent='★ '+name; chip.onclick=()=>{eqVals=[...saved[name]];buildSliders();}; let del=document.createElement('span');del.textContent=' ×';del.style.color='#f66';del.onclick=e=>{e.stopPropagation();delete saved[name];localStorage.setItem('tubeCustomEQ',JSON.stringify(saved));refreshChips();}; chip.appendChild(del); c.appendChild(chip);});}
 refreshChips();
-document.getElementById('saveBtn').onclick=()=>{let name=prompt('Nama Custom:','Disco '+new Date().toLocaleTimeString());if(!name) return;let s=JSON.parse(localStorage.getItem('tubeCustomEQ')||'{}');s[name]=[...eqVals];localStorage.setItem('tubeCustomEQ',JSON.stringify(s));refreshChips();};
-// ---------- BABYLON ----------
+document.getElementById('saveBtn').onclick=()=>{ let n=prompt('Nama Custom:','Disco '+Date.now()); if(!n)return; let s=JSON.parse(localStorage.getItem('tubeCustomEQ')||'{}'); s[n]=[...eqVals]; localStorage.setItem('tubeCustomEQ',JSON.stringify(s)); refreshChips(); };
+// BABYLON - REAL TUBE TV
 const canvas=document.getElementById('renderCanvas');
-const engine=new BABYLON.Engine(canvas,true,{preserveDrawingBuffer:true,stencil:true,antialias:true});
-let scene,camera,screenMesh,tvBars=[],colorBarTex;
-function makeColorBarTexture(scene){
+const engine=new BABYLON.Engine(canvas,true,{antialias:true, preserveDrawingBuffer:true});
+let scene,camera,screenMesh,tvBars=[], colorTex;
+function makeBarsTex(scene){
  let tex=new BABYLON.DynamicTexture('bars', {width:1024,height:768}, scene,false);
  let ctx=tex.getContext();
  let cols=['#FFFFFF','#FFFF00','#00FFFF','#00FF00','#FF00FF','#FF0000','#0000FF'];
  let w=1024/cols.length;
- cols.forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(i*w,0,w,768*0.68);});
- let small=['#0000FF','#000000','#FF00FF','#000000','#00FFFF','#000000','#FFFFFF'];
- let bh=768*0.16; small.forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(i*w,768*0.68,w,bh);});
- ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,768*0.84,1024,768*0.16);
- ctx.fillStyle='#fff';ctx.font='bold 32px monospace';ctx.fillText('HITACHI • AC/DC • COLOR • TUBE DISCO',20,768*0.92);
+ cols.forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(i*w,0,w,768*0.66);});
+ let small=['#0022FF','#000000','#FF00FF','#000000','#00FFFF','#000000','#FFFFFF'];
+ let bh=768*0.14; small.forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(i*w,768*0.66,w,bh);});
+ ctx.fillStyle='rgba(0,0,0,0.75)';ctx.fillRect(0,768*0.80,1024,768*0.20);
+ ctx.fillStyle='#E8E2D0';ctx.font='bold 36px monospace';ctx.fillText('HITACHI • AC/DC • 14" • COLOR',24,768*0.90);
+ ctx.fillStyle='#D4AF37';ctx.font='bold 20px monospace';ctx.fillText('VHF 2 3 4 8 6 50 60 70  |  UHF 7 9 11 12 13 14-83CH',24,768*0.95);
  tex.update(); return tex;
 }
 function createScene(){
  scene=new BABYLON.Scene(engine);
- scene.clearColor=new BABYLON.Color4(0.07,0.07,0.09,1);
- camera=new BABYLON.ArcRotateCamera('cam', -Math.PI/2, Math.PI/2.3, 6, new BABYLON.Vector3(0,0.2,0), scene);
- camera.lowerRadiusLimit=3; camera.upperRadiusLimit=10;
- camera.lowerBetaLimit=0.2; camera.upperBetaLimit=Math.PI-0.2;
- camera.wheelPrecision=50;
+ scene.clearColor=new BABYLON.Color4(0.09,0.09,0.11,1);
+ camera=new BABYLON.ArcRotateCamera('cam', -Math.PI/2, Math.PI/2.25, 5.8, new BABYLON.Vector3(0,0.15,0), scene);
+ camera.lowerRadiusLimit=2.8; camera.upperRadiusLimit=9;
+ camera.lowerBetaLimit=0.3; camera.upperBetaLimit=Math.PI-0.3;
+ camera.wheelPrecision=40;
  camera.attachControl(canvas,true);
- let hemi=new BABYLON.HemisphericLight('hemi', new BABYLON.Vector3(0,1,0), scene); hemi.intensity=0.7;
- let dir=new BABYLON.DirectionalLight('dir', new BABYLON.Vector3(-0.5,1,-1), scene); dir.intensity=0.9;
- let tvRoot=new BABYLON.TransformNode('tvRoot', scene);
- // materials simple standard to avoid PBR overexposure
+ camera.minZ=0.1;
+ let hemi=new BABYLON.HemisphericLight('hemi', new BABYLON.Vector3(0,1,0.3), scene); hemi.intensity=0.85;
+ let dir=new BABYLON.DirectionalLight('dir', new BABYLON.Vector3(-0.8,1,-0.6), scene); dir.intensity=0.8;
+ dir.position.set(4,6,4);
+ let root=new BABYLON.TransformNode('root', scene);
+ // body - main silver box with rounded look via 2 boxes
  let bodyMat=new BABYLON.StandardMaterial('bodyMat', scene);
- bodyMat.diffuseColor=new BABYLON.Color3(0.78,0.78,0.8); bodyMat.specularColor=new BABYLON.Color3(0.2,0.2,0.2);
- let body=BABYLON.MeshBuilder.CreateBox('body',{width:3.6,height:2.6,depth:1.6},scene);
- body.parent=tvRoot; body.material=bodyMat; body.position.y=0.2;
- let front=BABYLON.MeshBuilder.CreateBox('front',{width:3.7,height:2.7,depth:0.18},scene);
- front.parent=tvRoot; front.position.set(0,0.2,0.88); front.material=bodyMat;
- colorBarTex=makeColorBarTexture(scene);
+ bodyMat.diffuseColor=new BABYLON.Color3(0.72,0.72,0.74);
+ bodyMat.specularColor=new BABYLON.Color3(0.15,0.15,0.15);
+ bodyMat.specularPower=32;
+ // main chassis
+ let chassis=BABYLON.MeshBuilder.CreateBox('chassis',{width:3.8,height:2.9,depth:2.0},scene);
+ chassis.parent=root; chassis.position.y=0.15; chassis.material=bodyMat;
+ // front thick bezel - slightly bigger, silver
+ let frontBezel=BABYLON.MeshBuilder.CreateBox('frontBezel',{width:3.9,height:3.0,depth:0.35},scene);
+ frontBezel.parent=root; frontBezel.position.set(0,0.15,1.15); frontBezel.material=bodyMat;
+ // CRT frame black inner
+ let frameMat=new BABYLON.StandardMaterial('frameMat',scene);
+ frameMat.diffuseColor=new BABYLON.Color3(0.07,0.07,0.09);
+ frameMat.specularColor=new BABYLON.Color3(0.05,0.05,0.05);
+ let frame=BABYLON.MeshBuilder.CreateBox('frame',{width:3.05,height:2.25,depth:0.08},scene);
+ frame.parent=root; frame.position.set(0,0.35,1.33); frame.material=frameMat;
+ // screen - curved
+ colorTex=makeBarsTex(scene);
  let scrMat=new BABYLON.StandardMaterial('scrMat',scene);
- scrMat.diffuseTexture=colorBarTex; scrMat.emissiveTexture=colorBarTex; scrMat.emissiveColor=new BABYLON.Color3(1,1,1); scrMat.backFaceCulling=false;
- screenMesh=BABYLON.MeshBuilder.CreatePlane('screen',{width:2.6,height:1.95},scene);
- screenMesh.parent=tvRoot; screenMesh.position.set(0,0.32,0.98); screenMesh.material=scrMat;
- let frameMat=new BABYLON.StandardMaterial('frameMat',scene); frameMat.diffuseColor=new BABYLON.Color3(0.08,0.08,0.1);
- let grill=BABYLON.MeshBuilder.CreateBox('grill',{width:3.4,height:0.5,depth:0.12},scene);
- grill.parent=tvRoot; grill.position.set(0,-0.85,0.92); grill.material=frameMat;
- // 15 disco bars on TV
+ scrMat.diffuseTexture=colorTex; scrMat.emissiveTexture=colorTex; scrMat.emissiveColor=new BABYLON.Color3(0.9,0.9,0.9);
+ scrMat.specularColor=new BABYLON.Color3(0,0,0);
+ scrMat.backFaceCulling=false;
+ screenMesh=BABYLON.MeshBuilder.CreatePlane('screen',{width:2.65,height:1.95, subdivisions:12},scene);
+ screenMesh.parent=root; screenMesh.position.set(0,0.35,1.38); screenMesh.material=scrMat;
+ // bulge
+ let pos=screenMesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+ for(let i=0;i<pos.length;i+=3){
+  let x=pos[i], y=pos[i+1];
+  let bulge=0.22*(x*x + y*y*0.8);
+  pos[i+2]-=bulge;
+ }
+ screenMesh.setVerticesData(BABYLON.VertexBuffer.PositionKind,pos);
+ screenMesh.isPickable=false;
+ // bottom panel - darker
+ let bottomMat=new BABYLON.StandardMaterial('bottomMat',scene);
+ bottomMat.diffuseColor=new BABYLON.Color3(0.18,0.18,0.19);
+ bottomMat.specularColor=new BABYLON.Color3(0.1,0.1,0.1);
+ let bottom=BABYLON.MeshBuilder.CreateBox('bottom',{width:3.7,height:0.62,depth:0.2},scene);
+ bottom.parent=root; bottom.position.set(0,-0.95,1.22); bottom.material=bottomMat;
+ // 15 equalizer bars on TV (real 3D)
  tvBars=[];
  for(let i=0;i<15;i++){
-  let m=new BABYLON.StandardMaterial('barM'+i,scene); m.emissiveColor=new BABYLON.Color3(0.2,0.5,1); m.disableLighting=true;
-  let bar=BABYLON.MeshBuilder.CreateBox('tvBar'+i,{width:0.11,height:0.35,depth:0.02},scene);
-  bar.parent=tvRoot; bar.position.set(-1.28 + i*0.183, -0.85, 1.0); bar.material=m; bar.scaling.y=0.3;
+  let m=new BABYLON.StandardMaterial('barM'+i,scene); m.emissiveColor=new BABYLON.Color3(0.2,0.6,1); m.disableLighting=true;
+  let bar=BABYLON.MeshBuilder.CreateBox('bar'+i,{width:0.105,height:0.38,depth:0.02},scene);
+  bar.parent=root; bar.position.set(-1.32 + i*0.188, -0.95, 1.34); bar.material=m; bar.scaling.y=0.25;
   tvBars.push(bar);
  }
- let ground=BABYLON.MeshBuilder.CreateGround('gnd',{width:12,height:12},scene);
- let gMat=new BABYLON.StandardMaterial('gMat',scene); gMat.diffuseColor=new BABYLON.Color3(0.12,0.12,0.13); gMat.specularColor=new BABYLON.Color3(0,0,0);
- ground.material=gMat; ground.position.y=-1.3;
- document.getElementById('loading').style.display='none';
- scene.onBeforeRenderObservable.add(trackOverlaySimple);
+ // HITACHI logo
+ let logoTex=new BABYLON.DynamicTexture('logoTex',{width:512,height:128},scene);
+ let lctx=logoTex.getContext(); lctx.clearRect(0,0,512,128); lctx.fillStyle='#111'; lctx.fillRect(0,0,512,128); lctx.fillStyle='#E8E2D0'; lctx.font='bold 48px Syne'; lctx.fillText('HITACHI',18,82);
+ logoTex.update();
+ let logoMat=new BABYLON.StandardMaterial('logoMat',scene); logoMat.diffuseTexture=logoTex; logoMat.emissiveTexture=logoTex; logoMat.emissiveColor=new BABYLON.Color3(0.8,0.8,0.8);
+ let logo=BABYLON.MeshBuilder.CreatePlane('logo',{width:0.62,height:0.16},scene);
+ logo.parent=root; logo.position.set(1.25,-0.95,1.35); logo.material=logoMat;
+ // ground
+ let gnd=BABYLON.MeshBuilder.CreateGround('gnd',{width:14,height:14},scene);
+ let gMat=new BABYLON.StandardMaterial('gMat',scene); gMat.diffuseColor=new BABYLON.Color3(0.10,0.10,0.11); gMat.specularColor=new BABYLON.Color3(0,0,0);
+ gnd.material=gMat; gnd.position.y=-1.45;
+ document.getElementById('load').style.display='none';
+ scene.onBeforeRenderObservable.add(updateYTBox);
  return scene;
 }
-function trackOverlaySimple(){
- let overlay=document.getElementById('ytOverlay');
- if(!overlay.classList.contains('active')) return;
- // simple center tracking: project screen center
- let worldCenter=screenMesh.getAbsolutePosition();
- let pos=BABYLON.Vector3.Project(worldCenter, BABYLON.Matrix.Identity(), scene.getTransformMatrix(), camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()));
- let toCam=camera.position.subtract(worldCenter).normalize();
+function updateYTBox(){
+ let box=document.getElementById('ytBox');
+ if(!box.classList.contains('show')) return;
+ if(!screenMesh) return;
+ // get 4 corners world
+ let hw=1.325, hh=0.975;
+ let cornersLocal=[
+  new BABYLON.Vector3(-hw, hh, 0),
+  new BABYLON.Vector3(hw, hh, 0),
+  new BABYLON.Vector3(hw, -hh, 0),
+  new BABYLON.Vector3(-hw, -hh, 0)
+ ];
+ let wm=screenMesh.getWorldMatrix();
+ let projected=[];
+ let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+ let allBehind=true;
+ for(let lc of cornersLocal){
+  let wc=BABYLON.Vector3.TransformCoordinates(lc, wm);
+  let p=BABYLON.Vector3.Project(wc, BABYLON.Matrix.Identity(), scene.getTransformMatrix(), camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()));
+  projected.push(p);
+  if(p.z>=0 && p.z<=1) allBehind=false;
+  minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y);
+ }
+ // facing
+ let center=screenMesh.getAbsolutePosition();
+ let toCam=camera.position.subtract(center).normalize();
  let normal=screenMesh.getDirection(BABYLON.Axis.Z);
  let dot=BABYLON.Vector3.Dot(normal, toCam);
- if(dot<0.05){ overlay.style.opacity='0.15'; }
- else {
-  overlay.style.opacity='1';
-  // slight parallax based on projection
-  let canvasRect=document.getElementById('canvasWrap').getBoundingClientRect();
-  // keep centered but nudge a bit with projection
-  let targetLeft = (pos.x / engine.getRenderWidth())*100;
-  let targetTop = (pos.y / engine.getRenderHeight())*60; // 60% of wrap
-  // clamp to avoid jump
-  targetLeft=Math.max(20,Math.min(80,targetLeft));
-  targetTop=Math.max(25,Math.min(65,targetTop));
-  overlay.style.left=targetLeft+'%';
-  overlay.style.top=targetTop+'%';
-  // scale by distance
-  let dist=BABYLON.Vector3.Distance(camera.position, worldCenter);
-  let scale=Math.max(0.6, Math.min(1.2, 6/dist));
-  overlay.style.width=(46*scale)+'%';
-  overlay.style.height=(42*scale)+'%';
+ if(allBehind || dot<0.08 || (maxX-minX)<18 || (maxY-minY)<12){
+  box.style.display='none';
+  return;
  }
+ box.style.display='block';
+ box.style.left=minX+'px';
+ box.style.top=minY+'px';
+ box.style.width=(maxX-minX)+'px';
+ box.style.height=(maxY-minY)+'px';
+ box.style.opacity= dot>0.3? '1' : (0.3+dot).toString();
 }
 let sc=createScene();
 engine.runRenderLoop(()=>sc.render());
 window.addEventListener('resize',()=>engine.resize());
-// ---------- AUDIO FAKE ----------
-function setupFakeAudio(){
- try{ if(audioCtx) audioCtx.close(); }catch(e){}
+// fake audio for disco
+function setupFake(){
+ try{if(audioCtx) audioCtx.close();}catch(e){}
  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
- analyser=audioCtx.createAnalyser(); analyser.fftSize=256; analyser.smoothingTimeConstant=0.8;
+ analyser=audioCtx.createAnalyser(); analyser.fftSize=256; analyser.smoothingTimeConstant=0.85;
  isFake=true; filters=[];
- freqs.forEach((fq,i)=>{let f=audioCtx.createBiquadFilter(); f.type='peaking'; f.frequency.value=fq; f.Q.value=1; f.gain.value=eqVals[i]; filters.push(f);});
+ freqs.forEach((f,i)=>{let fl=audioCtx.createBiquadFilter(); fl.type='peaking'; fl.frequency.value=f; fl.Q.value=1; fl.gain.value=eqVals[i]; filters.push(fl);});
 }
-setupFakeAudio();
-// ---------- DISCO CANVAS ----------
-const discoCanvas=document.getElementById('discoCanvas'), dCtx=discoCanvas.getContext('2d');
-function renderDisco(){
- let W=discoCanvas.width,H=discoCanvas.height;
+setupFake();
+// disco canvas
+const discoCan=document.getElementById('disco'), dCtx=discoCan.getContext('2d');
+function discoLoop(){
+ let W=discoCan.width,H=discoCan.height;
  dCtx.clearRect(0,0,W,H);
- dCtx.fillStyle='rgba(0,0,0,0.5)'; dCtx.fillRect(0,0,W,H);
- let barCount=32, barW=W/barCount*0.68, gap=W/barCount*0.32;
- for(let i=0;i<barCount;i++){
+ dCtx.fillStyle='rgba(0,0,0,0.6)'; dCtx.fillRect(0,0,W,H);
+ let count=32, bw=W/count*0.65, gap=W/count*0.35;
+ for(let i=0;i<count;i++){
   let t=Date.now()*0.001;
-  let v=0.25+0.6*Math.abs(Math.sin(t*(1.1+i*0.11)+i))* (0.7 + 0.8*Math.sin(t*3)*(i<6?1:0.3)) + Math.random()*0.08;
-  if(analyser && !isFake){
-   let data=new Uint8Array(analyser.frequencyBinCount);
-   analyser.getByteFrequencyData(data);
-   let idx=Math.floor((i/barCount)*data.length);
-   v=data[idx]/255;
-  }
+  let v=0.2+0.6*Math.abs(Math.sin(t*(1.2+i*0.09)+i))* (0.6+0.9*Math.sin(t*2.8)*(i<5?1.2:0.3)) + Math.random()*0.07;
   v=Math.min(1,Math.max(0,v));
-  let h=v*H*0.86, x=i*(barW+gap)+gap*0.5, y=H-h;
+  let h=v*H*0.9, x=i*(bw+gap)+gap*0.5, y=H-h;
   let hue=(i*11 + Date.now()*0.02)%360;
   let grad=dCtx.createLinearGradient(x,y,x,H);
   grad.addColorStop(0,`hsl(${hue},100%,68%)`);
   grad.addColorStop(1,`hsl(${hue},90%,38%)`);
-  dCtx.fillStyle=grad; dCtx.shadowColor=`hsl(${hue},100%,60%)`; dCtx.shadowBlur=16*v; dCtx.fillRect(x,y,barW,h); dCtx.shadowBlur=0;
-  // TV bars update
+  dCtx.fillStyle=grad; dCtx.shadowColor=`hsl(${hue},100%,60%)`; dCtx.shadowBlur=14*v; dCtx.fillRect(x,y,bw,h); dCtx.shadowBlur=0;
   if(i<15){
-   let scale=0.2+v*2.0;
-   tvBars[i].scaling.y=scale;
-   tvBars[i].position.y=-0.85-0.05+scale*0.12;
-   let c=BABYLON.Color3.FromHSV(hue/360,0.9,0.7+v*0.4);
+   let sc=0.2+v*2.1;
+   tvBars[i].scaling.y=sc;
+   tvBars[i].position.y=-0.95-0.04+sc*0.11;
+   let c=BABYLON.Color3.FromHSV(hue/360,0.9,0.7+v*0.5);
    tvBars[i].material.emissiveColor=c;
   }
  }
- requestAnimationFrame(renderDisco);
+ requestAnimationFrame(discoLoop);
 }
-renderDisco();
-// ---------- YOUTUBE ----------
+discoLoop();
+// YT
 function parseId(url){
- let reg=/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/;
- let m=url.match(reg); if(m) return m[1]; if(url.length===11) return url; return null;
+ if(!url) return null;
+ // handle all formats + playlist
+ try{
+  let u=new URL(url);
+  let v=u.searchParams.get('v');
+  if(v && v.length===11) return v;
+  if(u.hostname==='youtu.be'){ let p=u.pathname.replace('/',''); if(p.length>=11) return p.substring(0,11); }
+  if(u.pathname.includes('/shorts/')){ let parts=u.pathname.split('/shorts/')[1]; if(parts) return parts.substring(0,11); }
+ }catch(e){}
+ let reg=/(?:youtube\.com\/(?:.*[?&]v=|v\/|embed\/|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/;
+ let m=url.match(reg); if(m) return m[1];
+ if(url.length===11) return url;
+ return null;
 }
 let ytPlayer=null;
 function loadYTAPI(){
  if(window.YT && window.YT.Player) return Promise.resolve();
  return new Promise(res=>{
-  if(document.querySelector('script[src*="iframe_api"]')){ let iv=setInterval(()=>{ if(window.YT && window.YT.Player){clearInterval(iv); res();}},200); return; }
-  let tag=document.createElement('script'); tag.src='https://www.youtube.com/iframe_api'; document.body.appendChild(tag);
+  if(document.querySelector('script[src*="iframe_api"]')){ let iv=setInterval(()=>{if(window.YT&&window.YT.Player){clearInterval(iv);res();}},200); return; }
+  let s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.body.appendChild(s);
   window.onYouTubeIframeAPIReady=()=>res();
  });
 }
-async function playYoutube(id){
- let overlay=document.getElementById('ytOverlay');
- overlay.innerHTML=''; overlay.classList.add('active');
- overlay.style.display='block';
+async function playId(id){
+ let box=document.getElementById('ytBox');
+ box.innerHTML=''; box.classList.add('show'); box.style.display='block';
  await loadYTAPI();
- // create new div for player
- let div=document.createElement('div'); div.id='ytp-'+Date.now(); div.style.width='100%'; div.style.height='100%'; overlay.appendChild(div);
+ // use nocookie host to reduce cookie errors
  if(ytPlayer && ytPlayer.destroy) try{ytPlayer.destroy();}catch(e){}
+ let div=document.createElement('div'); div.id='player-'+Date.now(); div.style.width='100%'; div.style.height='100%'; box.appendChild(div);
  ytPlayer=new YT.Player(div.id,{
+  host:'https://www.youtube-nocookie.com',
   videoId:id,
-  playerVars:{autoplay:1,controls:1,modestbranding:1,rel:0,playsinline:1,iv_load_policy:3},
+  playerVars:{autoplay:1,controls:1,modestbranding:1,rel:0,playsinline:1,iv_load_policy:3,origin:window.location.origin},
   events:{
-   onReady:e=>{ e.target.playVideo(); setupFakeAudio(); if(audioCtx.state==='suspended') audioCtx.resume(); document.getElementById('statusNote').textContent='Playing: '+id+' — video muncul di layar TV 3D! Disco mengikuti beat (fake-reactive karena YouTube CORS).'; },
-   onError:e=>{ document.getElementById('statusNote').textContent='YouTube error code '+e.data+' — coba link lain Bro.'; }
+   onReady:e=>{ e.target.playVideo(); setupFake(); if(audioCtx.state==='suspended') audioCtx.resume(); document.getElementById('stat').textContent='Playing '+id+' DI DALAM TABUNG! Putar TV 360° coba Bro, video nempel di kaca tabung.'; },
+   onError:e=>{ document.getElementById('stat').textContent='YT Error '+e.data+' coba link lain.'; }
   }
  });
 }
 document.getElementById('playBtn').onclick=()=>{
  let raw=document.getElementById('ytInput').value.trim();
  let id=parseId(raw);
- if(!id){ alert('Link tidak valid! contoh https://youtu.be/7dEYo1Qm0U'); return; }
- playYoutube(id);
+ if(!id){ alert('Link tidak valid Bro! Coba https://www.youtube.com/watch?v=AzRw52UTZ78 atau https://youtu.be/7dEYo1qOm0U'); return; }
+ playId(id);
 };
 document.getElementById('resetBtn').onclick=()=>{
  BABYLON.Animation.CreateAndStartAnimation('a1',camera,'alpha',60,25,camera.alpha,-Math.PI/2,BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
- BABYLON.Animation.CreateAndStartAnimation('a2',camera,'beta',60,25,camera.beta,Math.PI/2.3,BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
- BABYLON.Animation.CreateAndStartAnimation('a3',camera,'radius',60,25,camera.radius,6,BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
- document.getElementById('ytOverlay').style.left='50%'; document.getElementById('ytOverlay').style.top='41%';
+ BABYLON.Animation.CreateAndStartAnimation('a2',camera,'beta',60,25,camera.beta,Math.PI/2.25,BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+ BABYLON.Animation.CreateAndStartAnimation('a3',camera,'radius',60,25,camera.radius,5.8,BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 };
-document.getElementById('fsBtn').onclick=()=>{ let el=document.getElementById('canvasWrap'); if(!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen(); };
-document.getElementById('discoTestBtn').onclick=async()=>{
- setupFakeAudio(); if(audioCtx.state==='suspended') await audioCtx.resume();
- let osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
- osc.type='sawtooth'; osc.frequency.value=55; gain.gain.value=0.25;
- osc.connect(gain); gain.connect(analyser);
- osc.start(); setTimeout(()=>{osc.stop();},3500);
- document.getElementById('statusNote').textContent='Test disco running — 15 bar TV bawah ikut joget!';
+document.getElementById('fsBtn').onclick=()=>{ let el=document.getElementById('wrap'); if(!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen(); };
+document.getElementById('testBtn').onclick=async()=>{
+ setupFake(); if(audioCtx.state==='suspended') await audioCtx.resume();
+ let osc=audioCtx.createOscillator(), g=audioCtx.createGain(); osc.type='sawtooth'; osc.frequency.value=60; g.gain.value=0.25; osc.connect(g); g.connect(analyser); osc.start(); setTimeout(()=>osc.stop(),3500);
+ document.getElementById('stat').textContent='Test disco: 15 bar di TV bawah ikut joget!';
 };
 </script>
 </body>
